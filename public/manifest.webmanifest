@@ -1,0 +1,12 @@
+{
+  "name": "Sobrecarga — Treino & Força",
+  "short_name": "Sobrecarga",
+  "description": "Registre exercícios, carga e séries dos seus treinos.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#14161a",
+  "theme_color": "#14161a",
+  "icons": [
+    { "src": "/icone-96.png", "sizes": "96x96", "type": "image/png" }
+  ]
+}
