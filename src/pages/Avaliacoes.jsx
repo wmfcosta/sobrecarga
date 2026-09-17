@@ -33,8 +33,12 @@ export default function Avaliacoes() {
 
   async function carregar() {
     setCarregando(true)
-    const dados = await api.listAssessments()
-    setAvaliacoes(dados ?? [])
+    try {
+      const dados = await api.listAssessments()
+      setAvaliacoes(dados ?? [])
+    } catch (err) {
+      setErro(err.message)
+    }
     setCarregando(false)
   }
 
