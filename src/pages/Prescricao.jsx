@@ -9,6 +9,11 @@ function novoDia(letra) {
   return { rotulo: `Treino ${letra}`, exercicios: [novoExercicio()] }
 }
 
+function encontrarExercicio(exercicios, nome) {
+  if (!nome) return null
+  return exercicios.find((e) => e.nome.toLowerCase() === nome.toLowerCase()) || null
+}
+
 export default function Prescricao() {
   const [alunos, setAlunos] = useState([])
   const [exercicios, setExercicios] = useState([])
@@ -141,34 +146,44 @@ export default function Prescricao() {
                 )}
               </div>
 
-              {dia.exercicios.map((ex, j) => (
-                <div key={j} className="linha-tres-campos">
-                  <label className="campo">
-                    <span>Exercício</span>
-                    <input
-                      type="text"
-                      list="lista-exercicios-prescricao"
-                      value={ex.exercicio_nome}
-                      onChange={(e) => atualizarExercicio(i, j, 'exercicio_nome', e.target.value)}
-                      placeholder="Digite para buscar..."
-                      autoComplete="off"
-                    />
-                  </label>
-                  <label className="campo">
-                    <span>Séries</span>
-                    <input inputMode="numeric" type="number" min="1" value={ex.series_alvo} onChange={(e) => atualizarExercicio(i, j, 'series_alvo', e.target.value)} />
-                  </label>
-                  <label className="campo">
-                    <span>Reps</span>
-                    <input type="text" placeholder="8-12" value={ex.repeticoes_alvo} onChange={(e) => atualizarExercicio(i, j, 'repeticoes_alvo', e.target.value)} />
-                  </label>
-                  <label className="campo">
-                    <span>Carga (kg)</span>
-                    <input inputMode="decimal" type="number" step="0.5" min="0" value={ex.carga_alvo_kg} onChange={(e) => atualizarExercicio(i, j, 'carga_alvo_kg', e.target.value)} />
-                  </label>
-                  <button type="button" className="botao-remover" aria-label="Remover exercício" onClick={() => removerExercicio(i, j)}>×</button>
+              {dia.exercicios.map((ex, j) => {
+                const encontrado = encontrarExercicio(exercicios, ex.exercicio_nome)
+                return (
+                <div key={j}>
+                  <div className="linha-tres-campos">
+                    <label className="campo">
+                      <span>Exercício</span>
+                      <input
+                        type="text"
+                        list="lista-exercicios-prescricao"
+                        value={ex.exercicio_nome}
+                        onChange={(e) => atualizarExercicio(i, j, 'exercicio_nome', e.target.value)}
+                        placeholder="Digite para buscar..."
+                        autoComplete="off"
+                      />
+                    </label>
+                    <label className="campo">
+                      <span>Séries</span>
+                      <input inputMode="numeric" type="number" min="1" value={ex.series_alvo} onChange={(e) => atualizarExercicio(i, j, 'series_alvo', e.target.value)} />
+                    </label>
+                    <label className="campo">
+                      <span>Reps</span>
+                      <input type="text" placeholder="8-12" value={ex.repeticoes_alvo} onChange={(e) => atualizarExercicio(i, j, 'repeticoes_alvo', e.target.value)} />
+                    </label>
+                    <label className="campo">
+                      <span>Carga (kg)</span>
+                      <input inputMode="decimal" type="number" step="0.5" min="0" value={ex.carga_alvo_kg} onChange={(e) => atualizarExercicio(i, j, 'carga_alvo_kg', e.target.value)} />
+                    </label>
+                    <button type="button" className="botao-remover" aria-label="Remover exercício" onClick={() => removerExercicio(i, j)}>×</button>
+                  </div>
+                  {encontrado?.gif_url && (
+                    <div className="preview-exercicio-mini">
+                      <img src={encontrado.gif_url} alt="" loading="lazy" />
+                      <span className="texto-secundario">{encontrado.nome}</span>
+                    </div>
+                  )}
                 </div>
-              ))}
+              )})}
 
               <button type="button" className="botao-link botao-link-inline" onClick={() => adicionarExercicio(i)}>
                 + Adicionar exercício

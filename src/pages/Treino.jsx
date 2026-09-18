@@ -189,6 +189,12 @@ export default function Treino() {
             {exercicios.map((ex) => <option key={ex.id} value={ex.nome} />)}
           </datalist>
         </label>
+        {exercicioSelecionado?.gif_url && (
+          <div className="preview-exercicio">
+            <img src={exercicioSelecionado.gif_url} alt="" loading="lazy" />
+            <p className="texto-secundario">Demonstração de {exercicioSelecionado.nome}</p>
+          </div>
+        )}
         <div className="linha-tres-campos">
           <label className="campo">
             <span>Série</span>

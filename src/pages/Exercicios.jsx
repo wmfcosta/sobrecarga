@@ -88,7 +88,11 @@ export default function Exercicios() {
         <ul className="lista-exercicios">
           {listaFiltrada.map((ex) => (
             <li key={ex.id} className="item-exercicio">
-              <span className="marcador-grupo" aria-hidden />
+              {ex.gif_url ? (
+                <img src={ex.gif_url} alt="" className="gif-exercicio" loading="lazy" />
+              ) : (
+                <span className="marcador-grupo" aria-hidden />
+              )}
               <div>
                 <p className="nome-exercicio">{ex.nome}</p>
                 <p className="texto-secundario">{ex.grupo_muscular}</p>
