@@ -4,7 +4,7 @@ import { requireAuth } from './_lib/auth.js'
 export default async function handler(req, res) {
   try {
     if (req.method === 'GET') {
-      const exercicios = await sql`select id, nome, grupo_muscular from exercises order by grupo_muscular, nome`
+      const exercicios = await sql`select id, nome, grupo_muscular, gif_url from exercises order by grupo_muscular, nome`
       return res.status(200).json(exercicios)
     }
     if (req.method === 'POST') {
