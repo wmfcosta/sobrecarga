@@ -3,8 +3,8 @@ import { sql } from '../_lib/db.js'
 // Endpoint unico de administracao (protegido pela chave do setup.js), reunindo
 // duas rotinas pontuais num so arquivo para nao estourar o limite de 12
 // Serverless Functions do plano Hobby da Vercel:
-//   POST /api/admin  { action: 'set-role', email, role }
-//   POST /api/admin  { action: 'import-exercises' }
+//   POST /api/admin/set-role  { action: 'set-role', email, role }
+//   POST /api/admin/set-role  { action: 'import-exercises' }
 
 const EXERCICIOS = [
   { nome: 'Supino reto com barra', grupo: 'Peito', gif: 'https://static.exercisedb.dev/media/EIeI8Vf.gif', exdb: 'EIeI8Vf', antigo: 'Supino reto' },
@@ -48,36 +48,36 @@ const EXERCICIOS = [
   { nome: 'Agachamento sumô com halter', grupo: 'Glúteos', gif: 'https://static.exercisedb.dev/media/KgI0tqW.gif', exdb: 'KgI0tqW', antigo: null },
   { nome: 'Desenvolvimento militar com barra', grupo: 'Ombro', gif: 'https://static.exercisedb.dev/media/jjUPrze.gif', exdb: 'jjUPrze', antigo: 'Desenvolvimento militar' },
   { nome: 'Desenvolvimento com halteres', grupo: 'Ombro', gif: 'https://static.exercisedb.dev/media/A6wtbuL.gif', exdb: 'A6wtbuL', antigo: null },
-  { nome: 'Desenvolvimento Arnold', grupo: 'Ombro', gif: 'https://static.exercisedb.dev/media/GTHkgSt.gif', exdb: 'GTHkgSt', antigo: null },
+  { nome: 'Desenvolvimento Arnold', grupo: 'Ombro', gif: 'https://static.exercisedb.dev/media/eOrFCnx.gif', exdb: 'eOrFCnx', antigo: null },
   { nome: 'Elevação lateral com halteres', grupo: 'Ombro', gif: 'https://static.exercisedb.dev/media/53Ttlck.gif', exdb: '53Ttlck', antigo: 'Elevação lateral' },
-  { nome: 'Elevação frontal com barra', grupo: 'Ombro', gif: 'https://static.exercisedb.dev/media/oGDeFhu.gif', exdb: 'oGDeFhu', antigo: null },
-  { nome: 'Crucifixo invertido (posterior de ombro)', grupo: 'Ombro', gif: 'https://static.exercisedb.dev/media/OTgt5tt.gif', exdb: 'OTgt5tt', antigo: null },
-  { nome: 'Remada alta (upright row)', grupo: 'Ombro', gif: 'https://static.exercisedb.dev/media/ZWtLkKW.gif', exdb: 'ZWtLkKW', antigo: null },
-  { nome: 'Rosca direta com barra', grupo: 'Bíceps', gif: 'https://static.exercisedb.dev/media/ILb1yaJ.gif', exdb: 'ILb1yaJ', antigo: 'Rosca direta' },
+  { nome: 'Elevação frontal com barra', grupo: 'Ombro', gif: 'https://static.exercisedb.dev/media/b2Uoz54.gif', exdb: 'b2Uoz54', antigo: null },
+  { nome: 'Crucifixo invertido (posterior de ombro)', grupo: 'Ombro', gif: 'https://static.exercisedb.dev/media/e25F58f.gif', exdb: 'e25F58f', antigo: null },
+  { nome: 'Remada alta (upright row)', grupo: 'Ombro', gif: 'https://static.exercisedb.dev/media/83HoW9X.gif', exdb: '83HoW9X', antigo: null },
+  { nome: 'Rosca direta com barra', grupo: 'Bíceps', gif: 'https://static.exercisedb.dev/media/25GPyDY.gif', exdb: '25GPyDY', antigo: 'Rosca direta' },
   { nome: 'Rosca alternada com halteres', grupo: 'Bíceps', gif: 'https://static.exercisedb.dev/media/2NpxjC1.gif', exdb: '2NpxjC1', antigo: 'Rosca alternada' },
   { nome: 'Rosca martelo', grupo: 'Bíceps', gif: 'https://static.exercisedb.dev/media/2NpxjC1.gif', exdb: '2NpxjC1', antigo: null },
-  { nome: 'Rosca scott (preacher)', grupo: 'Bíceps', gif: 'https://static.exercisedb.dev/media/mrZ2Q9s.gif', exdb: 'mrZ2Q9s', antigo: null },
-  { nome: 'Rosca concentrada', grupo: 'Bíceps', gif: 'https://static.exercisedb.dev/media/8xoJViv.gif', exdb: '8xoJViv', antigo: null },
-  { nome: 'Rosca no cabo', grupo: 'Bíceps', gif: 'https://static.exercisedb.dev/media/kEbYOHV.gif', exdb: 'kEbYOHV', antigo: null },
-  { nome: 'Tríceps testa (skull crusher)', grupo: 'Tríceps', gif: 'https://static.exercisedb.dev/media/1TVoin7.gif', exdb: '1TVoin7', antigo: 'Tríceps testa' },
-  { nome: 'Tríceps corda no cabo', grupo: 'Tríceps', gif: 'https://static.exercisedb.dev/media/9nOAySG.gif', exdb: '9nOAySG', antigo: 'Tríceps corda' },
-  { nome: 'Tríceps francês com halter', grupo: 'Tríceps', gif: 'https://static.exercisedb.dev/media/M8OGZTV.gif', exdb: 'M8OGZTV', antigo: null },
-  { nome: 'Tríceps coice (kickback)', grupo: 'Tríceps', gif: 'https://static.exercisedb.dev/media/JbC53Rl.gif', exdb: 'JbC53Rl', antigo: null },
+  { nome: 'Rosca scott (preacher)', grupo: 'Bíceps', gif: 'https://static.exercisedb.dev/media/4LIG9xr.gif', exdb: '4LIG9xr', antigo: null },
+  { nome: 'Rosca concentrada', grupo: 'Bíceps', gif: 'https://static.exercisedb.dev/media/gvsWLQw.gif', exdb: 'gvsWLQw', antigo: null },
+  { nome: 'Rosca no cabo', grupo: 'Bíceps', gif: 'https://static.exercisedb.dev/media/G08RZcQ.gif', exdb: 'G08RZcQ', antigo: null },
+  { nome: 'Tríceps testa (skull crusher)', grupo: 'Tríceps', gif: 'https://static.exercisedb.dev/media/h8LFzo9.gif', exdb: 'h8LFzo9', antigo: 'Tríceps testa' },
+  { nome: 'Tríceps corda no cabo', grupo: 'Tríceps', gif: 'https://static.exercisedb.dev/media/dU605di.gif', exdb: 'dU605di', antigo: 'Tríceps corda' },
+  { nome: 'Tríceps francês com halter', grupo: 'Tríceps', gif: 'https://static.exercisedb.dev/media/5uFK1xr.gif', exdb: '5uFK1xr', antigo: null },
+  { nome: 'Tríceps coice (kickback)', grupo: 'Tríceps', gif: 'https://static.exercisedb.dev/media/Gi2BXfK.gif', exdb: 'Gi2BXfK', antigo: null },
   { nome: 'Mergulho (dips) para tríceps', grupo: 'Tríceps', gif: 'https://static.exercisedb.dev/media/05Cf2v8.gif', exdb: '05Cf2v8', antigo: null },
-  { nome: 'Rosca de punho (wrist curl)', grupo: 'Antebraço', gif: 'https://static.exercisedb.dev/media/1qOvXjv.gif', exdb: '1qOvXjv', antigo: null },
-  { nome: 'Rosca de punho invertida', grupo: 'Antebraço', gif: 'https://static.exercisedb.dev/media/lNPQnJd.gif', exdb: 'lNPQnJd', antigo: null },
-  { nome: 'Abdominal supra (crunch)', grupo: 'Abdômen', gif: 'https://static.exercisedb.dev/media/rQveJp8.gif', exdb: 'rQveJp8', antigo: 'Abdominal supra' },
-  { nome: 'Abdominal na polia (cable crunch)', grupo: 'Abdômen', gif: 'https://static.exercisedb.dev/media/xtT4uV3.gif', exdb: 'xtT4uV3', antigo: null },
-  { nome: 'Abdominal declinado', grupo: 'Abdômen', gif: 'https://static.exercisedb.dev/media/RaYNSEg.gif', exdb: 'RaYNSEg', antigo: null },
+  { nome: 'Rosca de punho (wrist curl)', grupo: 'Antebraço', gif: 'https://static.exercisedb.dev/media/82LxxkW.gif', exdb: '82LxxkW', antigo: null },
+  { nome: 'Rosca de punho invertida', grupo: 'Antebraço', gif: 'https://static.exercisedb.dev/media/BLCvwr2.gif', exdb: 'BLCvwr2', antigo: null },
+  { nome: 'Abdominal supra (crunch)', grupo: 'Abdômen', gif: 'https://static.exercisedb.dev/media/kjJ3VoQ.gif', exdb: 'kjJ3VoQ', antigo: 'Abdominal supra' },
+  { nome: 'Abdominal na polia (cable crunch)', grupo: 'Abdômen', gif: 'https://static.exercisedb.dev/media/8xUv4J7.gif', exdb: '8xUv4J7', antigo: null },
+  { nome: 'Abdominal declinado', grupo: 'Abdômen', gif: 'https://static.exercisedb.dev/media/9Ap7miY.gif', exdb: '9Ap7miY', antigo: null },
   { nome: 'Abdominal infra (elevação de pernas)', grupo: 'Abdômen', gif: 'https://static.exercisedb.dev/media/03lzqwk.gif', exdb: '03lzqwk', antigo: null },
   { nome: 'Prancha abdominal', grupo: 'Abdômen', gif: 'https://static.exercisedb.dev/media/5VXmnV5.gif', exdb: '5VXmnV5', antigo: null },
-  { nome: 'Giro russo (russian twist)', grupo: 'Abdômen', gif: 'https://static.exercisedb.dev/media/Zx05HuA.gif', exdb: 'Zx05HuA', antigo: null },
-  { nome: 'Escalador (mountain climber)', grupo: 'Abdômen', gif: 'https://static.exercisedb.dev/media/wPCXfMD.gif', exdb: 'wPCXfMD', antigo: null },
-  { nome: 'Corrida na esteira', grupo: 'Cardio', gif: 'https://static.exercisedb.dev/media/T2XjO4o.gif', exdb: 'T2XjO4o', antigo: 'Corrida' },
-  { nome: 'Bicicleta ergométrica', grupo: 'Cardio', gif: 'https://static.exercisedb.dev/media/vjjIji9.gif', exdb: 'vjjIji9', antigo: 'Bicicleta ergométrica' },
-  { nome: 'Pular corda', grupo: 'Cardio', gif: 'https://static.exercisedb.dev/media/oCttmuP.gif', exdb: 'oCttmuP', antigo: 'Pular corda' },
-  { nome: 'Burpee', grupo: 'Cardio', gif: 'https://static.exercisedb.dev/media/Gc0y7Ba.gif', exdb: 'Gc0y7Ba', antigo: null },
-  { nome: 'Subida no step (stepmill)', grupo: 'Cardio', gif: 'https://static.exercisedb.dev/media/pKcCFwh.gif', exdb: 'pKcCFwh', antigo: null }
+  { nome: 'Giro russo (russian twist)', grupo: 'Abdômen', gif: 'https://static.exercisedb.dev/media/fZFZ704.gif', exdb: 'fZFZ704', antigo: null },
+  { nome: 'Escalador (mountain climber)', grupo: 'Abdômen', gif: 'https://static.exercisedb.dev/media/9c6T1YX.gif', exdb: '9c6T1YX', antigo: null },
+  { nome: 'Corrida na esteira', grupo: 'Cardio', gif: 'https://static.exercisedb.dev/media/CcWEoWV.gif', exdb: 'CcWEoWV', antigo: 'Corrida' },
+  { nome: 'Bicicleta ergométrica', grupo: 'Cardio', gif: 'https://static.exercisedb.dev/media/H1PESYI.gif', exdb: 'H1PESYI', antigo: 'Bicicleta ergométrica' },
+  { nome: 'Pular corda', grupo: 'Cardio', gif: 'https://static.exercisedb.dev/media/e1e76I2.gif', exdb: 'e1e76I2', antigo: 'Pular corda' },
+  { nome: 'Burpee', grupo: 'Cardio', gif: 'https://static.exercisedb.dev/media/dK9394r.gif', exdb: 'dK9394r', antigo: null },
+  { nome: 'Subida no step (stepmill)', grupo: 'Cardio', gif: 'https://static.exercisedb.dev/media/j9Q5crt.gif', exdb: 'j9Q5crt', antigo: null }
 ]
 
 async function importarExercicios() {
