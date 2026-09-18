@@ -22,7 +22,7 @@ const EXERCICIOS = [
   { nome: 'Remada unilateral com halter', grupo: 'Costas', gif: 'https://static.exercisedb.dev/media/g9AsZ8P.gif', exdb: 'g9AsZ8P', antigo: null },
   { nome: 'Remada cavalinho (T-bar)', grupo: 'Costas', gif: 'https://static.exercisedb.dev/media/FVM1AUZ.gif', exdb: 'FVM1AUZ', antigo: null },
   { nome: 'Barra fixa pegada neutra', grupo: 'Costas', gif: 'https://static.exercisedb.dev/media/0V2YQjW.gif', exdb: '0V2YQjW', antigo: null },
-  { nome: 'Barra fixa supinada', grupo: 'Costas', gif: 'https://static.exercisedb.dev/media/dVeWXf2.gif', exdb: 'dVeWXf2', antigo: null },
+  { nome: 'Barra fixa supinada', grupo: 'Costas', gif: 'https://static.exercisedb.dev/media/G70mEAJ.gif', exdb: 'G70mEAJ', antigo: null },
   { nome: 'Levantamento terra', grupo: 'Posterior/Costas', gif: 'https://static.exercisedb.dev/media/ila4NZS.gif', exdb: 'ila4NZS', antigo: 'Levantamento terra' },
   { nome: 'Levantamento terra sumô', grupo: 'Posterior/Costas', gif: 'https://static.exercisedb.dev/media/KgI0tqW.gif', exdb: 'KgI0tqW', antigo: null },
   { nome: 'Levantamento terra romeno', grupo: 'Posterior/Costas', gif: 'https://static.exercisedb.dev/media/5eLRITT.gif', exdb: '5eLRITT', antigo: null },
