@@ -91,7 +91,7 @@ button, input, select {
   width: 100%;
   max-width: 260px;
   height: auto;
-  margin: 0 0 12px;
+  margin: 0 auto 12px;
 }
 
 .cartao-auth h1 {
