@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     }
 
     const emailNormalizado = email.trim().toLowerCase()
-    const usuarios = await sql`select id, nome, email, senha_hash, idade, altura_cm, peso_kg from users where email = ${emailNormalizado}`
+    const usuarios = await sql`select id, nome, email, senha_hash, idade, altura_cm, peso_kg, role from users where email = ${emailNormalizado}`
     const user = usuarios[0]
     if (!user) return res.status(401).json({ error: 'E-mail ou senha incorretos.' })
 
@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     const token = gerarToken(user.id)
     return res.status(200).json({
       token,
-      user: { id: user.id, nome: user.nome, email: user.email, idade: user.idade, altura_cm: user.altura_cm, peso_kg: user.peso_kg },
+      user: { id: user.id, nome: user.nome, email: user.email, idade: user.idade, altura_cm: user.altura_cm, peso_kg: user.peso_kg, role: user.role },
     })
   } catch (e) {
     return res.status(500).json({ error: 'Erro ao entrar. Tente novamente.' })

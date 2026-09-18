@@ -18,6 +18,7 @@ export default async function handler(req, res) {
   await sql`alter table users add column if not exists idade int`
   await sql`alter table users add column if not exists altura_cm numeric(5,1)`
   await sql`alter table users add column if not exists peso_kg numeric(5,1)`
+  await sql`alter table users add column if not exists role text not null default 'aluno'`
 
   await sql`create table if not exists exercises (
     id uuid primary key default gen_random_uuid(),
@@ -66,6 +67,39 @@ export default async function handler(req, res) {
     suprailiaca_mm numeric(4,1),
     created_at timestamptz not null default now(),
     unique(user_id, data)
+  )`
+
+  // Plano de treino periodizado: o personal (role = 'personal') prescreve um ciclo
+  // semanal fixo (Treino A, B, C...) para um aluno. É referência — o registro real
+  // de carga/séries continua livre, nas tabelas workouts/workout_sets acima.
+  await sql`create table if not exists plans (
+    id uuid primary key default gen_random_uuid(),
+    aluno_id uuid not null references users(id) on delete cascade,
+    personal_id uuid references users(id) on delete set null,
+    nome text not null,
+    ativo boolean not null default true,
+    created_at timestamptz not null default now()
+  )`
+
+  await sql`create unique index if not exists plans_aluno_ativo_idx
+    on plans (aluno_id) where ativo`
+
+  await sql`create table if not exists plan_days (
+    id uuid primary key default gen_random_uuid(),
+    plan_id uuid not null references plans(id) on delete cascade,
+    rotulo text not null,
+    ordem int not null default 0
+  )`
+
+  await sql`create table if not exists plan_exercises (
+    id uuid primary key default gen_random_uuid(),
+    plan_day_id uuid not null references plan_days(id) on delete cascade,
+    exercicio_nome text not null,
+    series_alvo int,
+    repeticoes_alvo text,
+    carga_alvo_kg numeric(6,2),
+    observacoes text,
+    ordem int not null default 0
   )`
 
   const existentes = await sql`select count(*)::int as total from exercises`

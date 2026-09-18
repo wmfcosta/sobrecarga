@@ -47,6 +47,11 @@ export const api = {
   listAssessments: () => request('/assessments', { auth: true }),
   saveAssessment: (payload) => request('/assessments', { method: 'POST', body: payload, auth: true }),
   deleteAssessment: (id) => request(`/assessments?id=${encodeURIComponent(id)}`, { method: 'DELETE', auth: true }),
+  listStudents: () => request('/students', { auth: true }),
+  getMyPlan: () => request('/plans', { auth: true }),
+  getStudentPlan: (alunoId) => request(`/plans?aluno_id=${encodeURIComponent(alunoId)}`, { auth: true }),
+  savePlan: (payload) => request('/plans', { method: 'POST', body: payload, auth: true }),
+  deletePlan: (id) => request(`/plans?id=${encodeURIComponent(id)}`, { method: 'DELETE', auth: true }),
   getToken,
   setToken,
 }

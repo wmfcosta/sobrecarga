@@ -7,12 +7,16 @@ import Historico from './pages/Historico'
 import Progresso from './pages/Progresso'
 import Perfil from './pages/Perfil'
 import Avaliacoes from './pages/Avaliacoes'
+import Plano from './pages/Plano'
+import Prescricao from './pages/Prescricao'
 
 function AreaLogada() {
   const { user, profile, loading, signOut } = useAuth()
 
   if (loading) return <div className="tela-carregando">Carregando...</div>
   if (!user) return <Entrar />
+
+  const ehPersonal = profile?.role === 'personal'
 
   return (
     <div className="app-shell">
@@ -35,6 +39,11 @@ function AreaLogada() {
           <Route path="/progresso" element={<Progresso />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/avaliacoes" element={<Avaliacoes />} />
+          {ehPersonal ? (
+            <Route path="/prescricao" element={<Prescricao />} />
+          ) : (
+            <Route path="/plano" element={<Plano />} />
+          )}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
@@ -55,6 +64,15 @@ function AreaLogada() {
         <NavLink to="/avaliacoes" className={({ isActive }) => isActive ? 'nav-ativo' : ''}>
           <span>Avaliação</span>
         </NavLink>
+        {ehPersonal ? (
+          <NavLink to="/prescricao" className={({ isActive }) => isActive ? 'nav-ativo' : ''}>
+            <span>Prescrever</span>
+          </NavLink>
+        ) : (
+          <NavLink to="/plano" className={({ isActive }) => isActive ? 'nav-ativo' : ''}>
+            <span>Plano</span>
+          </NavLink>
+        )}
       </nav>
     </div>
   )

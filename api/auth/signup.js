@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     const criados = await sql`
       insert into users (nome, email, senha_hash, idade, altura_cm, peso_kg)
       values (${nome.trim()}, ${emailNormalizado}, ${hash}, ${idade || null}, ${altura || null}, ${peso || null})
-      returning id, nome, email, idade, altura_cm, peso_kg`
+      returning id, nome, email, idade, altura_cm, peso_kg, role`
     const user = criados[0]
     const token = gerarToken(user.id)
     return res.status(200).json({ token, user })

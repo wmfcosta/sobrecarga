@@ -6,7 +6,7 @@ export default async function handler(req, res) {
     const userId = requireAuth(req)
 
     if (req.method === 'GET') {
-      const usuarios = await sql`select id, nome, email, idade, altura_cm, peso_kg from users where id = ${userId}`
+      const usuarios = await sql`select id, nome, email, idade, altura_cm, peso_kg, role from users where id = ${userId}`
       if (usuarios.length === 0) return res.status(404).json({ error: 'Usuário não encontrado.' })
       return res.status(200).json(usuarios[0])
     }
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
           altura_cm = ${altura || null},
           peso_kg = ${peso || null}
         where id = ${userId}
-        returning id, nome, email, idade, altura_cm, peso_kg`
+        returning id, nome, email, idade, altura_cm, peso_kg, role`
       return res.status(200).json(atualizados[0])
     }
 
