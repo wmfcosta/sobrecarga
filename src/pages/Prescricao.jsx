@@ -11,6 +11,7 @@ function novoDia(letra) {
 
 export default function Prescricao() {
   const [alunos, setAlunos] = useState([])
+  const [exercicios, setExercicios] = useState([])
   const [alunoId, setAlunoId] = useState('')
   const [planoAtual, setPlanoAtual] = useState(undefined)
   const [nome, setNome] = useState('')
@@ -21,6 +22,7 @@ export default function Prescricao() {
 
   useEffect(() => {
     api.listStudents().then(setAlunos).catch((err) => setErro(err.message))
+    api.listExercises().then(setExercicios).catch(() => setExercicios([]))
   }, [])
 
   useEffect(() => {
@@ -121,6 +123,10 @@ export default function Prescricao() {
             <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex: Hipertrofia - Fase 1" />
           </label>
 
+          <datalist id="lista-exercicios-prescricao">
+            {exercicios.map((ex) => <option key={ex.id} value={ex.nome} />)}
+          </datalist>
+
           {dias.map((dia, i) => (
             <div key={i} className="cartao">
               <div className="linha-dois-campos">
@@ -139,7 +145,14 @@ export default function Prescricao() {
                 <div key={j} className="linha-tres-campos">
                   <label className="campo">
                     <span>Exercício</span>
-                    <input type="text" value={ex.exercicio_nome} onChange={(e) => atualizarExercicio(i, j, 'exercicio_nome', e.target.value)} />
+                    <input
+                      type="text"
+                      list="lista-exercicios-prescricao"
+                      value={ex.exercicio_nome}
+                      onChange={(e) => atualizarExercicio(i, j, 'exercicio_nome', e.target.value)}
+                      placeholder="Digite para buscar..."
+                      autoComplete="off"
+                    />
                   </label>
                   <label className="campo">
                     <span>Séries</span>
