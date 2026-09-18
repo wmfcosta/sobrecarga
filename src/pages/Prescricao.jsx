@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
+import VisualizadorGif from '../components/VisualizadorGif'
 
 function novoExercicio() {
   return { exercicio_nome: '', series_alvo: '', repeticoes_alvo: '', carga_alvo_kg: '', observacoes: '' }
@@ -24,6 +25,7 @@ export default function Prescricao() {
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState('')
   const [sucesso, setSucesso] = useState(false)
+  const [gifAmpliado, setGifAmpliado] = useState(null)
 
   useEffect(() => {
     api.listStudents().then(setAlunos).catch((err) => setErro(err.message))
@@ -178,7 +180,12 @@ export default function Prescricao() {
                   </div>
                   {encontrado?.gif_url && (
                     <div className="preview-exercicio-mini">
-                      <img src={encontrado.gif_url} alt="" loading="lazy" />
+                      <img
+                        src={encontrado.gif_url}
+                        alt=""
+                        loading="lazy"
+                        onClick={() => setGifAmpliado({ url: encontrado.gif_url, nome: encontrado.nome })}
+                      />
                       <span className="texto-secundario">{encontrado.nome}</span>
                     </div>
                   )}
@@ -203,6 +210,8 @@ export default function Prescricao() {
           </button>
         </form>
       )}
+
+      <VisualizadorGif gif={gifAmpliado} aoFechar={() => setGifAmpliado(null)} />
     </div>
   )
 }

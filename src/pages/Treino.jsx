@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
+import VisualizadorGif from '../components/VisualizadorGif'
 
 function hoje() {
   return new Date().toISOString().slice(0, 10)
@@ -22,6 +23,7 @@ export default function Treino() {
   const [tempoMin, setTempoMin] = useState('')
   const [calorias, setCalorias] = useState('')
   const [editandoId, setEditandoId] = useState(null)
+  const [gifAmpliado, setGifAmpliado] = useState(null)
 
   const exercicioSelecionado = exercicios.find((ex) => ex.id === exercicioId)
   const ehCardio = exercicioSelecionado?.grupo_muscular === 'Cardio'
@@ -191,7 +193,12 @@ export default function Treino() {
         </label>
         {exercicioSelecionado?.gif_url && (
           <div className="preview-exercicio">
-            <img src={exercicioSelecionado.gif_url} alt="" loading="lazy" />
+            <img
+              src={exercicioSelecionado.gif_url}
+              alt=""
+              loading="lazy"
+              onClick={() => setGifAmpliado({ url: exercicioSelecionado.gif_url, nome: exercicioSelecionado.nome })}
+            />
             <p className="texto-secundario">Demonstração de {exercicioSelecionado.nome}</p>
           </div>
         )}
@@ -260,6 +267,8 @@ export default function Treino() {
           ))}
         </div>
       )}
+
+      <VisualizadorGif gif={gifAmpliado} aoFechar={() => setGifAmpliado(null)} />
     </div>
   )
 }

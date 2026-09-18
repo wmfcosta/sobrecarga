@@ -419,6 +419,7 @@ button, input, select {
   object-fit: cover;
   flex-shrink: 0;
   background: var(--superficie-alta);
+  cursor: pointer;
 }
 
 .preview-exercicio {
@@ -437,6 +438,7 @@ button, input, select {
   border-radius: 8px;
   object-fit: cover;
   flex-shrink: 0;
+  cursor: pointer;
 }
 
 .preview-exercicio-mini {
@@ -451,6 +453,54 @@ button, input, select {
   border-radius: 6px;
   object-fit: cover;
   flex-shrink: 0;
+  cursor: pointer;
+}
+
+.overlay-gif {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 50;
+}
+
+.conteudo-overlay-gif {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  padding: 20px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.conteudo-overlay-gif img {
+  width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.botao-fechar-overlay {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--superficie-alta);
+  border: 1px solid var(--borda);
+  color: var(--texto);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
 }
 
 /* Treino / séries */

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
+import VisualizadorGif from '../components/VisualizadorGif'
 
 const GRUPOS = ['Peito', 'Costas', 'Pernas', 'Ombro', 'Bíceps', 'Tríceps', 'Abdômen', 'Panturrilha', 'Posterior/Costas', 'Cardio', 'Outro']
 
@@ -12,6 +13,7 @@ export default function Exercicios() {
   const [grupo, setGrupo] = useState(GRUPOS[0])
   const [salvando, setSalvando] = useState(false)
   const [erro, setErro] = useState('')
+  const [gifAmpliado, setGifAmpliado] = useState(null)
 
   async function carregar() {
     setCarregando(true)
@@ -89,7 +91,13 @@ export default function Exercicios() {
           {listaFiltrada.map((ex) => (
             <li key={ex.id} className="item-exercicio">
               {ex.gif_url ? (
-                <img src={ex.gif_url} alt="" className="gif-exercicio" loading="lazy" />
+                <img
+                  src={ex.gif_url}
+                  alt=""
+                  className="gif-exercicio"
+                  loading="lazy"
+                  onClick={() => setGifAmpliado({ url: ex.gif_url, nome: ex.nome })}
+                />
               ) : (
                 <span className="marcador-grupo" aria-hidden />
               )}
@@ -101,6 +109,8 @@ export default function Exercicios() {
           ))}
         </ul>
       )}
+
+      <VisualizadorGif gif={gifAmpliado} aoFechar={() => setGifAmpliado(null)} />
     </div>
   )
 }
