@@ -89,9 +89,9 @@ button, input, select {
 .logo-auth {
   display: block;
   width: 100%;
-  max-width: 260px;
+  max-width: 150px;
   height: auto;
-  margin: 0 auto 12px;
+  margin: 0 auto 16px;
 }
 
 .cartao-auth h1 {
