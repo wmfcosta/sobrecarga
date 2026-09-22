@@ -7,6 +7,7 @@ export default function Perfil() {
   const [idade, setIdade] = useState('')
   const [altura, setAltura] = useState('')
   const [peso, setPeso] = useState('')
+  const [descanso, setDescanso] = useState('')
   const [carregando, setCarregando] = useState(true)
   const [salvando, setSalvando] = useState(false)
   const [salvo, setSalvo] = useState(false)
@@ -17,6 +18,7 @@ export default function Perfil() {
       setIdade(dados.idade != null ? String(dados.idade) : '')
       setAltura(dados.altura_cm != null ? String(dados.altura_cm) : '')
       setPeso(dados.peso_kg != null ? String(dados.peso_kg) : '')
+      setDescanso(dados.descanso_min != null ? String(Number(dados.descanso_min)) : '')
       setCarregando(false)
     })
   }, [])
@@ -31,6 +33,7 @@ export default function Perfil() {
         idade: idade ? parseInt(idade, 10) : null,
         altura: altura ? parseFloat(altura) : null,
         peso: peso ? parseFloat(peso) : null,
+        descanso_min: descanso ? parseFloat(descanso.replace(',', '.')) : null,
       })
       atualizarPerfil(atualizado)
       setSalvo(true)
@@ -67,6 +70,14 @@ export default function Perfil() {
               <input inputMode="decimal" type="number" step="0.1" min="0" value={peso} onChange={(e) => setPeso(e.target.value)} placeholder="70" />
             </label>
           </div>
+
+          <label className="campo">
+            <span>Descanso entre séries (min)</span>
+            <input inputMode="decimal" type="number" step="0.25" min="0.25" max="30" value={descanso} onChange={(e) => setDescanso(e.target.value)} placeholder="ex.: 1,5" />
+            <small className="texto-secundario">
+              Ao registrar uma série, o cronômetro de descanso inicia e o app avisa quando o tempo acabar. Deixe vazio para desligar.
+            </small>
+          </label>
 
           {erro && <p className="mensagem-erro">{erro}</p>}
           {salvo && <p className="texto-secundario">Perfil atualizado.</p>}

@@ -6,20 +6,27 @@ export default async function handler(req, res) {
     const userId = requireAuth(req)
 
     if (req.method === 'GET') {
-      const usuarios = await sql`select id, nome, email, idade, altura_cm, peso_kg, role from users where id = ${userId}`
+      // select * mantém a leitura funcionando mesmo antes de a coluna descanso_min existir
+      const usuarios = await sql`select * from users where id = ${userId}`
       if (usuarios.length === 0) return res.status(404).json({ error: 'Usuário não encontrado.' })
-      return res.status(200).json(usuarios[0])
+      const { senha_hash, created_at, ...perfil } = usuarios[0]
+      return res.status(200).json({ descanso_min: null, ...perfil })
     }
 
     if (req.method === 'PUT') {
-      const { idade, altura, peso } = req.body || {}
+      const { idade, altura, peso, descanso_min } = req.body || {}
+      const descanso = descanso_min != null && descanso_min !== '' ? Number(descanso_min) : null
+      if (descanso != null && (!Number.isFinite(descanso) || descanso < 0.25 || descanso > 30)) {
+        return res.status(400).json({ error: 'Tempo de descanso deve ser entre 0,25 e 30 minutos.' })
+      }
       const atualizados = await sql`
         update users set
           idade = ${idade || null},
           altura_cm = ${altura || null},
-          peso_kg = ${peso || null}
+          peso_kg = ${peso || null},
+          descanso_min = ${descanso}
         where id = ${userId}
-        returning id, nome, email, idade, altura_cm, peso_kg, role`
+        returning id, nome, email, idade, altura_cm, peso_kg, role, descanso_min`
       return res.status(200).json(atualizados[0])
     }
 

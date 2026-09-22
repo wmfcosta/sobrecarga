@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, NavLink, Navigate, Link } from 'react-router-dom'
 import { AuthProvider, useAuth } from './lib/AuthContext'
+import { DescansoProvider } from './lib/DescansoContext'
+import BarraDescanso from './components/BarraDescanso'
 import Entrar from './pages/Entrar'
 import Treino from './pages/Treino'
 import Exercicios from './pages/Exercicios'
@@ -48,6 +50,8 @@ function AreaLogada() {
         </Routes>
       </main>
 
+      <BarraDescanso />
+
       <nav className="nav-inferior">
         <NavLink to="/" end className={({ isActive }) => isActive ? 'nav-ativo' : ''}>
           <span>Treino</span>
@@ -82,7 +86,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AreaLogada />
+        <DescansoProvider>
+          <AreaLogada />
+        </DescansoProvider>
       </AuthProvider>
     </BrowserRouter>
   )

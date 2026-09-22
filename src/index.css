@@ -785,3 +785,108 @@ button, input, select {
 @media (max-width: 420px) {
   .linha-dois-campos { grid-template-columns: 1fr 1fr; }
 }
+
+/* ---------- Cronômetro de descanso ---------- */
+
+.barra-descanso {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(64px + env(safe-area-inset-bottom));
+  max-width: 616px;
+  margin: 0 auto;
+  background: var(--superficie-alta);
+  border: 1px solid var(--aco);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  z-index: 20;
+}
+
+.barra-descanso-progresso {
+  position: absolute;
+  inset: 0;
+  background: rgba(91, 122, 148, 0.22);
+  transform-origin: left;
+  transition: transform 0.25s linear;
+  pointer-events: none;
+}
+
+.barra-descanso-conteudo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+}
+
+.barra-descanso-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.barra-descanso-titulo {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--texto-secundario);
+}
+
+.barra-descanso-rotulo {
+  font-size: 13px;
+  color: var(--texto);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.barra-descanso-tempo {
+  font-family: var(--fonte-dado);
+  font-size: 28px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--texto);
+}
+
+.barra-descanso-acoes {
+  display: flex;
+  gap: 6px;
+}
+
+.barra-descanso-acoes .botao-mini {
+  flex: 0 0 auto;
+  padding: 8px 10px;
+}
+
+.barra-descanso-fim {
+  border-color: var(--ferrugem);
+  animation: pulso-descanso 1s ease-in-out 3;
+}
+
+.barra-descanso-fim .barra-descanso-progresso {
+  background: rgba(232, 84, 46, 0.25);
+}
+
+.barra-descanso-fim .barra-descanso-tempo {
+  color: var(--ferrugem);
+}
+
+@keyframes pulso-descanso {
+  50% { box-shadow: 0 0 0 6px rgba(232, 84, 46, 0.35); }
+}
+
+.dica-descanso {
+  font-size: 13px;
+  margin: 0;
+  text-align: center;
+}
+
+.dica-descanso a { color: var(--aco); }
+
+/* espaço extra para a barra não cobrir o conteúdo */
+.app-shell:has(.barra-descanso) .conteudo-app {
+  padding-bottom: 180px;
+}

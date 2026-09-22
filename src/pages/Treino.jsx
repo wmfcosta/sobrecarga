@@ -2,12 +2,18 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import VisualizadorGif from '../components/VisualizadorGif'
+import { DicaDescanso } from '../components/BarraDescanso'
+import { useAuth } from '../lib/AuthContext'
+import { useDescanso } from '../lib/DescansoContext'
 
 function hoje() {
   return new Date().toISOString().slice(0, 10)
 }
 
 export default function Treino() {
+  const { profile } = useAuth()
+  const { iniciar: iniciarDescanso } = useDescanso()
+  const descansoMin = profile?.descanso_min != null ? Number(profile.descanso_min) : null
   const [searchParams, setSearchParams] = useSearchParams()
   const [data, setData] = useState(searchParams.get('data') || hoje())
   const [treino, setTreino] = useState(null)
@@ -127,10 +133,15 @@ export default function Treino() {
       } else {
         const t = await garantirTreino()
         if (!t) return
+        const numero = parseInt(serieNumero, 10) || 1
+        // Inicia o descanso já no toque (necessário para liberar som/notificação no celular)
+        if (!ehCardio && descansoMin > 0) {
+          iniciarDescanso(descansoMin, `${exercicioSelecionado?.nome ?? 'exercício'} · série ${numero + 1}`)
+        }
         await api.createSet({
           workout_id: t.id,
           exercise_id: exercicioId,
-          numero_serie: parseInt(serieNumero, 10) || 1,
+          numero_serie: numero,
           ...payload,
         })
       }
@@ -232,6 +243,7 @@ export default function Treino() {
           )}
         </div>
         <button className="botao-primario" type="submit">{editandoId ? 'Salvar edição' : 'Registrar série'}</button>
+        {!ehCardio && !(descansoMin > 0) && <DicaDescanso />}
       </form>
 
       {carregando ? (
