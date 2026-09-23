@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
+import { dataLocalISO } from '../lib/datas'
 
 function hoje() {
-  return new Date().toISOString().slice(0, 10)
+  return dataLocalISO()
 }
 
 const CAMPOS_DETALHE = [

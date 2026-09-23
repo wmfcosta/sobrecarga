@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
+import { dataLocalISO } from '../lib/datas'
 import VisualizadorGif from '../components/VisualizadorGif'
 import { DicaDescanso } from '../components/BarraDescanso'
 import { useAuth } from '../lib/AuthContext'
 import { useDescanso } from '../lib/DescansoContext'
 
 function hoje() {
-  return new Date().toISOString().slice(0, 10)
+  return dataLocalISO()
 }
 
 export default function Treino() {

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { dataLocalISO } from '../lib/datas'
 import { api } from '../lib/api'
 import {
   ResponsiveContainer, LineChart, Line, BarChart, Bar,
@@ -244,5 +245,5 @@ function inicioDaSemana(iso) {
   const d = new Date(iso + 'T00:00:00')
   const diaSemana = (d.getDay() + 6) % 7 // 0 = segunda
   d.setDate(d.getDate() - diaSemana)
-  return d.toISOString().slice(0, 10)
+  return dataLocalISO(d)
 }
