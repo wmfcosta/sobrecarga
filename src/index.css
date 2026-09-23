@@ -682,7 +682,17 @@ button, input, select {
   margin-bottom: 14px;
 }
 
+.cabecalho-grafico .nome-exercicio {
+  flex-shrink: 0;
+}
+
 .cabecalho-grafico select {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   background: var(--superficie-alta);
   border: 1px solid var(--borda);
   border-radius: 6px;
