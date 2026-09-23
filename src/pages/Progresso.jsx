@@ -83,6 +83,15 @@ export default function Progresso() {
       .map(([data, carga]) => ({ data: formatarCurto(data), carga }))
   }, [registros, exercicioForca])
 
+  // Com um único dia registrado, mostra a carga de cada série daquele dia
+  const dadosForcaSeries = useMemo(() => {
+    if (dadosForca.length !== 1) return []
+    return registros
+      .filter((r) => r.exercicio_nome === exercicioForca && r.carga_kg != null)
+      .sort((a, b) => (a.numero_serie ?? 0) - (b.numero_serie ?? 0))
+      .map((r) => ({ data: `S${r.numero_serie}`, carga: Number(r.carga_kg), reps: r.repeticoes }))
+  }, [registros, exercicioForca, dadosForca])
+
   const dadosCardio = useMemo(() => {
     const porDia = {}
     for (const r of registros) {
@@ -176,7 +185,24 @@ export default function Progresso() {
         {nomesForca.length === 0 ? (
           <p className="texto-secundario">Registre algumas séries para ver o comparativo.</p>
         ) : dadosForca.length < 2 ? (
-          <p className="texto-secundario">Registre este exercício em pelo menos 2 dias diferentes para comparar.</p>
+          <>
+            <p className="texto-secundario">
+              Séries de {dadosForca[0]?.data}. A partir do 2º dia com este exercício, o gráfico mostra a evolução da carga máxima por dia.
+            </p>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={dadosForcaSeries} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+                <CartesianGrid stroke={CORES.borda} vertical={false} />
+                <XAxis dataKey="data" stroke={CORES.texto} fontSize={12} tickLine={false} />
+                <YAxis stroke={CORES.texto} fontSize={12} tickLine={false} unit="kg" />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  labelStyle={{ color: CORES.texto }}
+                  formatter={(valor, _nome, item) => [`${valor} kg × ${item.payload.reps ?? '-'} reps`, 'Carga']}
+                />
+                <Bar dataKey="carga" name="Carga (kg)" fill={CORES.ferrugem} radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </>
         ) : (
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={dadosForca} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
