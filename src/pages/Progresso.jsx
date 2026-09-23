@@ -104,7 +104,8 @@ export default function Progresso() {
   }, [registros, exercicioCardio])
 
   const dadosFrequencia = useMemo(() => {
-    const diasUnicos = [...new Set(treinos.map((t) => t.data))]
+    // só conta dias com pelo menos uma série registrada
+    const diasUnicos = [...new Set(treinos.filter((t) => t.series?.length).map((t) => t.data))]
     const porSemana = {}
     for (const dia of diasUnicos) {
       const chave = inicioDaSemana(dia)
@@ -113,7 +114,11 @@ export default function Progresso() {
     return Object.entries(porSemana)
       .sort(([a], [b]) => a.localeCompare(b))
       .slice(-10)
-      .map(([semana, dias]) => ({ semana: formatarCurto(semana), dias }))
+      .map(([semana, dias]) => ({
+        semana: formatarCurto(semana),
+        periodo: `${formatarCurto(semana)} a ${formatarCurto(somarDias(semana, 6))}`,
+        dias,
+      }))
   }, [treinos])
 
   if (carregando) {
@@ -244,15 +249,22 @@ export default function Progresso() {
 
       <div className="cartao">
         <p className="nome-exercicio">Dias de treino por semana</p>
+        <p className="texto-secundario legenda-grafico">Cada barra é uma semana (seg. a dom.); a altura é quantos dias você treinou.</p>
         {dadosFrequencia.length === 0 ? (
           <p className="texto-secundario">Registre treinos para ver sua frequência semanal.</p>
         ) : (
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={dadosFrequencia} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
               <CartesianGrid stroke={CORES.borda} vertical={false} />
-              <XAxis dataKey="semana" stroke={CORES.texto} fontSize={12} tickLine={false} />
-              <YAxis stroke={CORES.texto} fontSize={12} tickLine={false} allowDecimals={false} />
-              <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: CORES.texto }} />
+              <XAxis dataKey="semana" stroke={CORES.texto} fontSize={12} tickLine={false} tickFormatter={(v) => `sem. ${v}`} />
+              <YAxis stroke={CORES.texto} fontSize={12} tickLine={false} allowDecimals={false} domain={[0, 7]} ticks={[0, 1, 2, 3, 4, 5, 6, 7]} />
+              <Tooltip
+                contentStyle={tooltipStyle}
+                labelStyle={{ color: CORES.texto }}
+                cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
+                labelFormatter={(_v, itens) => `Semana de ${itens?.[0]?.payload?.periodo ?? ''}`}
+                formatter={(valor) => [`${valor} ${valor === 1 ? 'dia' : 'dias'}`, 'Treinou']}
+              />
               <Bar dataKey="dias" name="Dias treinados" fill={CORES.ferrugem} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -265,6 +277,12 @@ export default function Progresso() {
 function formatarCurto(iso) {
   const [, mes, dia] = iso.split('-')
   return `${dia}/${mes}`
+}
+
+function somarDias(iso, dias) {
+  const d = new Date(iso + 'T00:00:00')
+  d.setDate(d.getDate() + dias)
+  return dataLocalISO(d)
 }
 
 function inicioDaSemana(iso) {

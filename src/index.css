@@ -900,3 +900,8 @@ button, input, select {
 .app-shell:has(.barra-descanso) .conteudo-app {
   padding-bottom: 180px;
 }
+
+.legenda-grafico {
+  font-size: 13px;
+  margin: 4px 0 12px;
+}
