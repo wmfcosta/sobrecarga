@@ -37,7 +37,7 @@ export default function Entrar() {
   return (
     <div className="tela-auth">
       <div className="cartao-auth">
-        <img src="/logo.png" alt="Sobrecarga: acompanhamento de treino de musculação" className="logo-auth" width="900" height="640" />
+        <img src="/logo.png" alt="Sobrecarga: acompanhamento de treino de musculação" className="logo-auth" width="900" height="652" />
         <h1>{modo === 'login' ? 'Entrar' : 'Criar conta'}</h1>
         <p className="texto-secundario">
           {modo === 'login' ? 'Continue registrando sua carga.' : 'Cadastre-se para começar a registrar seus treinos.'}
