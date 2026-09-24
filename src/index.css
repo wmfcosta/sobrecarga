@@ -905,3 +905,126 @@ button, input, select {
   font-size: 13px;
   margin: 4px 0 12px;
 }
+
+/* ---------- Sugestão full body ---------- */
+
+.sugestao { padding-top: 14px; }
+
+.sugestao-cabecalho {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sugestao-cabecalho .nome-exercicio { margin: 0; }
+.sugestao-cabecalho .texto-secundario { margin: 2px 0 0; font-size: 13px; }
+.sugestao-seta { color: var(--texto-secundario); font-size: 12px; }
+
+.sugestao-semana {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.sugestao-semana-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--texto-secundario);
+  min-width: 0;
+}
+
+.sugestao-semana-item small {
+  font-family: var(--fonte-dado);
+  color: var(--texto);
+}
+
+.sugestao-barra {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--superficie-alta);
+  overflow: hidden;
+}
+
+.sugestao-barra > div {
+  height: 100%;
+  background: var(--aco);
+  border-radius: 3px;
+}
+
+.sugestao-legenda { font-size: 12px; margin: 6px 0 0; }
+
+.sugestao-lista {
+  list-style: none;
+  padding: 0;
+  margin: 14px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sugestao-item {
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--superficie-alta);
+}
+
+.sugestao-item-feito { opacity: 0.55; }
+
+.sugestao-item-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.chip-padrao {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--aco);
+}
+
+.sugestao-progresso {
+  font-size: 12px;
+  color: var(--texto-secundario);
+  font-family: var(--fonte-dado);
+}
+
+.sugestao-item-feito .sugestao-progresso { color: var(--ferrugem); }
+
+.sugestao-nome {
+  margin: 4px 0 2px;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+.sugestao-prescricao {
+  margin: 0;
+  font-family: var(--fonte-dado);
+  font-size: 14px;
+  color: var(--texto);
+}
+
+.sugestao-prescricao strong { color: var(--ferrugem); }
+
+.sugestao-motivo { font-size: 12.5px; margin: 6px 0 0; line-height: 1.4; }
+
+.sugestao-acoes {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.sugestao-acoes .botao-mini { flex: 0 0 auto; padding: 7px 14px; }

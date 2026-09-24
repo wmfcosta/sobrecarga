@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { dataLocalISO } from '../lib/datas'
 import VisualizadorGif from '../components/VisualizadorGif'
 import { DicaDescanso } from '../components/BarraDescanso'
+import SugestaoFullBody from '../components/SugestaoFullBody'
 import { useAuth } from '../lib/AuthContext'
 import { useDescanso } from '../lib/DescansoContext'
 
@@ -31,6 +32,9 @@ export default function Treino() {
   const [calorias, setCalorias] = useState('')
   const [editandoId, setEditandoId] = useState(null)
   const [gifAmpliado, setGifAmpliado] = useState(null)
+  const [historico, setHistorico] = useState([])
+  const formRef = useRef(null)
+  const ehHoje = data === hoje()
 
   const exercicioSelecionado = exercicios.find((ex) => ex.id === exercicioId)
   const ehCardio = exercicioSelecionado?.grupo_muscular === 'Cardio'
@@ -44,6 +48,19 @@ export default function Treino() {
       }
     })
   }, [])
+
+  useEffect(() => {
+    api.getHistory().then((h) => setHistorico(h ?? [])).catch(() => {})
+  }, [])
+
+  function usarSugestao(item) {
+    limparFormulario()
+    setExercicioId(item.exercicio.id)
+    setBuscaExercicio(item.exercicio.nome)
+    if (item.carga != null) setCarga(String(item.carga))
+    if (item.reps != null) setRepeticoes(String(item.reps))
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 
   function selecionarPorNome(nomeDigitado) {
     setBuscaExercicio(nomeDigitado)
@@ -181,7 +198,17 @@ export default function Treino() {
         />
       </header>
 
-      <form onSubmit={registrarSerie} className="cartao form-serie">
+      {ehHoje && (
+        <SugestaoFullBody
+          exercicios={exercicios}
+          historico={historico}
+          seriesHoje={series}
+          hoje={data}
+          onUsar={usarSugestao}
+        />
+      )}
+
+      <form ref={formRef} onSubmit={registrarSerie} className="cartao form-serie">
         {editandoId && (
           <div className="aviso-edicao">
             <span>Editando série</span>

@@ -8,7 +8,7 @@ export default async function handler(req, res) {
 
     const treinos = await sql`select id, data::text as data from workouts where user_id = ${userId} order by data desc`
     const series = await sql`
-      select ws.id, ws.workout_id, ws.numero_serie, ws.carga_kg, ws.repeticoes, ws.tempo_min, ws.calorias,
+      select ws.id, ws.workout_id, ws.exercise_id, ws.numero_serie, ws.carga_kg, ws.repeticoes, ws.tempo_min, ws.calorias,
              e.nome as exercicio_nome
       from workout_sets ws
       join exercises e on e.id = ws.exercise_id
