@@ -1,22 +1,21 @@
 // Motor de sugestão de treino full body.
 //
 // Regras baseadas em evidência (ver doc "pesquisa-full-body" no projeto):
-// - Sessão organizada por padrões de movimento: agachar, quadril, empurrar, puxar,
-//   + 1 extra de empurrar/puxar (o mais atrasado na semana) + 1 core/acessório.
-// - 3 séries por exercício; compostos 8-12 reps, acessórios 10-15.
+// - Sessão de 9 exercícios por padrão de movimento: agachar, quadril, 2x empurrar,
+//   2x puxar, 2º de perna (o mais atrasado na semana), core e acessório.
+// - Compostos: 3 séries de 8-12 reps. Core e acessório: 2 séries de 10-15.
 // - Rotação: evita repetir o exercício feito no treino anterior do mesmo padrão.
 // - Carga por dupla progressão a partir da última sessão do exercício.
 
 export const PADROES = {
-  agachar: { rotulo: 'Agachar', faixa: [8, 12], metaSemana: 9 },
-  quadril: { rotulo: 'Quadril', faixa: [8, 12], metaSemana: 9 },
-  empurrar: { rotulo: 'Empurrar', faixa: [8, 12], metaSemana: 12 },
-  puxar: { rotulo: 'Puxar', faixa: [8, 12], metaSemana: 12 },
-  core: { rotulo: 'Core', faixa: [10, 15], metaSemana: 6 },
-  acessorio: { rotulo: 'Acessório', faixa: [10, 15], metaSemana: 6 },
+  agachar: { rotulo: 'Agachar', faixa: [8, 12], metaSemana: 12, series: 3 },
+  quadril: { rotulo: 'Quadril', faixa: [8, 12], metaSemana: 12, series: 3 },
+  empurrar: { rotulo: 'Empurrar', faixa: [8, 12], metaSemana: 18, series: 3 },
+  puxar: { rotulo: 'Puxar', faixa: [8, 12], metaSemana: 18, series: 3 },
+  core: { rotulo: 'Core', faixa: [10, 15], metaSemana: 6, series: 2 },
+  acessorio: { rotulo: 'Acessório', faixa: [10, 15], metaSemana: 6, series: 2 },
 }
 
-const SERIES_POR_EXERCICIO = 3
 
 function norm(txt) {
   return (txt || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -176,9 +175,10 @@ export function gerarSugestao({ exercicios, historico, hoje }) {
     if (!hojePorPadrao[p].includes(s.exercise_id)) hojePorPadrao[p].push(s.exercise_id)
   }
 
-  const extra = atraso('empurrar') <= atraso('puxar') ? 'empurrar' : 'puxar'
-  const fechamento = atraso('core') <= atraso('acessorio') ? 'core' : 'acessorio'
-  const slots = ['agachar', 'quadril', 'empurrar', 'puxar', extra, fechamento]
+  // 9 exercícios: base (agachar, quadril, empurrar, puxar), 2º de empurrar e puxar,
+  // 2º de perna (o padrão mais atrasado na semana), core e acessório
+  const pernaExtra = atraso('agachar') <= atraso('quadril') ? 'agachar' : 'quadril'
+  const slots = ['agachar', 'quadril', 'empurrar', 'puxar', 'empurrar', 'puxar', pernaExtra, 'core', 'acessorio']
 
   const usados = new Set()
   const itens = slots.map((padrao, i) => {
@@ -224,11 +224,11 @@ export function gerarSugestao({ exercicios, historico, hoje }) {
       padrao,
       rotuloPadrao: PADROES[padrao].rotulo,
       exercicio: escolhido,
-      series: SERIES_POR_EXERCICIO,
+      series: PADROES[padrao].series,
       faixa: `${min}-${max}`,
       ...carga,
       seriesFeitasHoje,
-      concluido: seriesFeitasHoje >= SERIES_POR_EXERCICIO,
+      concluido: seriesFeitasHoje >= PADROES[padrao].series,
       alternativas: ordenados.map((c) => c.ex).filter((ex) => ex.id !== escolhido.id),
     }
   }).filter(Boolean)
