@@ -8,6 +8,7 @@ export default function Perfil() {
   const [altura, setAltura] = useState('')
   const [peso, setPeso] = useState('')
   const [descanso, setDescanso] = useState('')
+  const [fullbody, setFullbody] = useState(false)
   const [carregando, setCarregando] = useState(true)
   const [salvando, setSalvando] = useState(false)
   const [salvo, setSalvo] = useState(false)
@@ -19,6 +20,7 @@ export default function Perfil() {
       setAltura(dados.altura_cm != null ? String(dados.altura_cm) : '')
       setPeso(dados.peso_kg != null ? String(dados.peso_kg) : '')
       setDescanso(dados.descanso_min != null ? String(Number(dados.descanso_min)) : '')
+      setFullbody(dados.fullbody_ativo === true)
       setCarregando(false)
     })
   }, [])
@@ -34,6 +36,7 @@ export default function Perfil() {
         altura: altura ? parseFloat(altura) : null,
         peso: peso ? parseFloat(peso) : null,
         descanso_min: descanso ? parseFloat(descanso.replace(',', '.')) : null,
+        fullbody_ativo: fullbody,
       })
       atualizarPerfil(atualizado)
       setSalvo(true)
@@ -77,6 +80,22 @@ export default function Perfil() {
             <small className="texto-secundario">
               Ao registrar uma série, o cronômetro de descanso inicia e o app avisa quando o tempo acabar. Deixe vazio para desligar.
             </small>
+          </label>
+
+          <label className="campo-alternar">
+            <div>
+              <span className="campo-alternar-titulo">Sugestão de treino full body</span>
+              <small className="texto-secundario">
+                Mostra na tela de Treino um treino full body sugerido, com carga calculada pelo seu histórico.
+              </small>
+            </div>
+            <input
+              type="checkbox"
+              role="switch"
+              className="alternar"
+              checked={fullbody}
+              onChange={(e) => setFullbody(e.target.checked)}
+            />
           </label>
 
           {erro && <p className="mensagem-erro">{erro}</p>}

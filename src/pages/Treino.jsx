@@ -35,6 +35,7 @@ export default function Treino() {
   const [historico, setHistorico] = useState([])
   const formRef = useRef(null)
   const ehHoje = data === hoje()
+  const fullbodyAtivo = profile?.fullbody_ativo === true
 
   const exercicioSelecionado = exercicios.find((ex) => ex.id === exercicioId)
   const ehCardio = exercicioSelecionado?.grupo_muscular === 'Cardio'
@@ -50,8 +51,9 @@ export default function Treino() {
   }, [])
 
   useEffect(() => {
+    if (!fullbodyAtivo) return
     api.getHistory().then((h) => setHistorico(h ?? [])).catch(() => {})
-  }, [])
+  }, [fullbodyAtivo])
 
   function usarSugestao(item) {
     limparFormulario()
@@ -198,7 +200,7 @@ export default function Treino() {
         />
       </header>
 
-      {ehHoje && (
+      {ehHoje && fullbodyAtivo && (
         <SugestaoFullBody
           exercicios={exercicios}
           historico={historico}

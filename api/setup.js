@@ -21,6 +21,8 @@ export default async function handler(req, res) {
   await sql`alter table users add column if not exists role text not null default 'aluno'`
   // Tempo de descanso entre séries, em minutos (aceita fração: 1.5 = 1min30s)
   await sql`alter table users add column if not exists descanso_min numeric(5,2)`
+  // Mostra (ou não) o cartão de sugestão full body na tela de Treino
+  await sql`alter table users add column if not exists fullbody_ativo boolean not null default false`
 
   await sql`create table if not exists exercises (
     id uuid primary key default gen_random_uuid(),
