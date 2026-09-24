@@ -24,7 +24,7 @@ function AreaLogada() {
     <div className="app-shell">
       <header className="topo-app">
         <div className="marca-wrapper">
-          <img src="/icone-96.png" alt="" className="marca-icone" />
+          <img src="/marca.png" alt="" className="marca-icone" />
           <p className="marca">SOBRECARGA<span>.</span></p>
         </div>
         <div className="usuario-topo">

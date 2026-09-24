@@ -64,11 +64,10 @@ button, input, select {
 }
 
 .marca-icone {
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
+  height: 30px;
+  width: auto;
   flex-shrink: 0;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .marca {
@@ -89,9 +88,9 @@ button, input, select {
 .logo-auth {
   display: block;
   width: 100%;
-  max-width: 150px;
+  max-width: 300px;
   height: auto;
-  margin: 0 auto 16px;
+  margin: 0 auto 20px;
 }
 
 .cartao-auth h1 {
