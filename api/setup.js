@@ -40,6 +40,13 @@ export default async function handler(req, res) {
     unique(user_id, data)
   )`
 
+  // Sessão de treino: início/fim, duração, calorias e intensidade informadas ao finalizar
+  await sql`alter table workouts add column if not exists inicio_em timestamptz`
+  await sql`alter table workouts add column if not exists fim_em timestamptz`
+  await sql`alter table workouts add column if not exists duracao_min int`
+  await sql`alter table workouts add column if not exists calorias_total int`
+  await sql`alter table workouts add column if not exists intensidade text`
+
   await sql`create table if not exists workout_sets (
     id uuid primary key default gen_random_uuid(),
     workout_id uuid not null references workouts(id) on delete cascade,

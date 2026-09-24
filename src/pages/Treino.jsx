@@ -5,6 +5,7 @@ import { dataLocalISO } from '../lib/datas'
 import VisualizadorGif from '../components/VisualizadorGif'
 import { DicaDescanso } from '../components/BarraDescanso'
 import SugestaoFullBody from '../components/SugestaoFullBody'
+import SessaoTreino from '../components/SessaoTreino'
 import { useAuth } from '../lib/AuthContext'
 import { useDescanso } from '../lib/DescansoContext'
 
@@ -100,6 +101,12 @@ export default function Treino() {
   }, [exercicioId, series, editandoId])
 
   async function garantirTreino() {
+    // Registrou série hoje sem tocar em "Iniciar treino": inicia automaticamente
+    if (ehHoje && !treino?.inicio_em) {
+      const iniciado = await api.iniciarTreino(data)
+      setTreino(iniciado)
+      return iniciado
+    }
     if (treino) return treino
     const novo = await api.ensureWorkout(data)
     setTreino(novo)
@@ -199,6 +206,10 @@ export default function Treino() {
           onChange={(e) => setData(e.target.value)}
         />
       </header>
+
+      {!carregando && (
+        <SessaoTreino treino={treino} data={data} ehHoje={ehHoje} onAtualizar={setTreino} />
+      )}
 
       {ehHoje && fullbodyAtivo && (
         <SugestaoFullBody
