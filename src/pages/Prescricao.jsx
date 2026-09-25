@@ -26,11 +26,36 @@ export default function Prescricao() {
   const [erro, setErro] = useState('')
   const [sucesso, setSucesso] = useState(false)
   const [gifAmpliado, setGifAmpliado] = useState(null)
+  const [modelos, setModelos] = useState([])
+  const [modeloConfirmando, setModeloConfirmando] = useState(null)
+  const [aplicandoModelo, setAplicandoModelo] = useState(false)
+  const [avisoModelo, setAvisoModelo] = useState('')
 
   useEffect(() => {
     api.listStudents().then(setAlunos).catch((err) => setErro(err.message))
     api.listExercises().then(setExercicios).catch(() => setExercicios([]))
+    api.getPlanTemplates().then(setModelos).catch(() => setModelos([]))
   }, [])
+
+  async function aplicarModelo(modelo) {
+    setAplicandoModelo(true)
+    setErro('')
+    setAvisoModelo('')
+    try {
+      const plano = await api.activatePlanTemplate(modelo.id, alunoId)
+      setPlanoAtual(plano)
+      setModeloConfirmando(null)
+      setAvisoModelo(
+        plano.exercicios_criados > 0
+          ? `Plano "${plano.nome}" aplicado. ${plano.exercicios_criados} exercício(s) novo(s) adicionados ao cadastro.`
+          : `Plano "${plano.nome}" aplicado.`,
+      )
+      api.listExercises().then(setExercicios).catch(() => {})
+    } catch (err) {
+      setErro(err.message)
+    }
+    setAplicandoModelo(false)
+  }
 
   useEffect(() => {
     if (!alunoId) {
@@ -122,6 +147,36 @@ export default function Prescricao() {
           </p>
         )}
       </div>
+
+      {alunoId && modelos.length > 0 && (
+        <div className="cartao form-inline">
+          <p className="nome-exercicio">Modelos prontos</p>
+          {avisoModelo && <p className="aviso-edicao">{avisoModelo}</p>}
+          {modelos.map((modelo) => (
+            <div key={modelo.id} className="modelo-plano">
+              <p className="texto-secundario">
+                <strong>{modelo.nome}</strong>: {modelo.dias.map((d) => d.rotulo.replace(/^Treino /, '')).join(' · ')}
+              </p>
+              {modeloConfirmando === modelo.id ? (
+                <div className="modal-acoes">
+                  <span className="texto-secundario">Aplicar a este aluno{planoAtual ? ' e substituir o plano atual' : ''}?</span>
+                  <button type="button" className="botao-secundario" disabled={aplicandoModelo} onClick={() => setModeloConfirmando(null)}>Cancelar</button>
+                  <button type="button" className="botao-primario" disabled={aplicandoModelo} onClick={() => aplicarModelo(modelo)}>
+                    {aplicandoModelo ? 'Aplicando...' : 'Aplicar'}
+                  </button>
+                </div>
+              ) : (
+                <div className="modal-acoes">
+                  <button type="button" className="botao-secundario" onClick={() => setModeloConfirmando(modelo.id)}>
+                    Usar modelo "{modelo.nome}"
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+          <p className="texto-secundario">Ou monte um plano personalizado abaixo.</p>
+        </div>
+      )}
 
       {alunoId && (
         <form onSubmit={salvar} className="cartao form-inline">

@@ -41,11 +41,8 @@ function AreaLogada() {
           <Route path="/progresso" element={<Progresso />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/avaliacoes" element={<Avaliacoes />} />
-          {ehPersonal ? (
-            <Route path="/prescricao" element={<Prescricao />} />
-          ) : (
-            <Route path="/plano" element={<Plano />} />
-          )}
+          <Route path="/plano" element={<Plano />} />
+          {ehPersonal && <Route path="/prescricao" element={<Prescricao />} />}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
@@ -68,13 +65,12 @@ function AreaLogada() {
         <NavLink to="/avaliacoes" className={({ isActive }) => isActive ? 'nav-ativo' : ''}>
           <span>Avaliação</span>
         </NavLink>
-        {ehPersonal ? (
+        <NavLink to="/plano" className={({ isActive }) => isActive ? 'nav-ativo' : ''}>
+          <span>Plano</span>
+        </NavLink>
+        {ehPersonal && (
           <NavLink to="/prescricao" className={({ isActive }) => isActive ? 'nav-ativo' : ''}>
             <span>Prescrever</span>
-          </NavLink>
-        ) : (
-          <NavLink to="/plano" className={({ isActive }) => isActive ? 'nav-ativo' : ''}>
-            <span>Plano</span>
           </NavLink>
         )}
       </nav>
