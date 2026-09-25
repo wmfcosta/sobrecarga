@@ -8,6 +8,8 @@ import {
 
 const CORES = { ferrugem: '#e8542e', aco: '#5b7a94', texto: '#8a9098', borda: '#30353c' }
 
+const INTENSIDADE_ROTULO = { normal: 'Normal', moderado: 'Moderado', pesado: 'Pesado', desafiador: 'Desafiador' }
+
 const tooltipStyle = {
   background: '#1c1f24',
   border: '1px solid #30353c',
@@ -102,6 +104,34 @@ export default function Progresso() {
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([data, calorias]) => ({ data: formatarCurto(data), calorias }))
   }, [registros, exercicioCardio])
+
+  // Séries de musculação (sem cardio) por treino, últimos 12 treinos
+  const dadosSeriesPorTreino = useMemo(() => (
+    [...treinos]
+      .map((t) => ({
+        dataIso: t.data,
+        series: (t.series || []).filter((s) => s.tempo_min == null).length,
+        exercicios: new Set((t.series || []).filter((s) => s.tempo_min == null).map((s) => s.exercicio_nome)).size,
+      }))
+      .filter((t) => t.series > 0)
+      .sort((a, b) => a.dataIso.localeCompare(b.dataIso))
+      .slice(-12)
+      .map((t) => ({ ...t, data: formatarCurto(t.dataIso) }))
+  ), [treinos])
+
+  // Calorias informadas ao finalizar o treino, últimos 12 treinos
+  const dadosCaloriasTreino = useMemo(() => (
+    [...treinos]
+      .filter((t) => t.calorias_total != null)
+      .sort((a, b) => a.data.localeCompare(b.data))
+      .slice(-12)
+      .map((t) => ({
+        data: formatarCurto(t.data),
+        calorias: Number(t.calorias_total),
+        duracao: t.duracao_min,
+        intensidade: t.intensidade,
+      }))
+  ), [treinos])
 
   const dadosFrequencia = useMemo(() => {
     // só conta dias com pelo menos uma série registrada
@@ -242,6 +272,63 @@ export default function Progresso() {
               <YAxis stroke={CORES.texto} fontSize={12} tickLine={false} unit="kcal" />
               <Tooltip contentStyle={tooltipStyle} labelStyle={{ color: CORES.texto }} />
               <Bar dataKey="calorias" name="Calorias" fill={CORES.aco} radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+
+      <div className="cartao">
+        <p className="nome-exercicio">Séries por treino</p>
+        <p className="texto-secundario legenda-grafico">Séries de musculação registradas em cada treino (últimos 12).</p>
+        {dadosSeriesPorTreino.length === 0 ? (
+          <p className="texto-secundario">Registre séries para ver o volume de cada treino.</p>
+        ) : (
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={dadosSeriesPorTreino} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
+              <CartesianGrid stroke={CORES.borda} vertical={false} />
+              <XAxis dataKey="data" stroke={CORES.texto} fontSize={12} tickLine={false} />
+              <YAxis stroke={CORES.texto} fontSize={12} tickLine={false} allowDecimals={false} />
+              <Tooltip
+                contentStyle={tooltipStyle}
+                labelStyle={{ color: CORES.texto }}
+                cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
+                itemStyle={{ color: '#edeef0' }}
+                formatter={(valor, _nome, item) => [
+                  `${valor} séries · ${item.payload.exercicios} ${item.payload.exercicios === 1 ? 'exercício' : 'exercícios'}`,
+                  'Volume',
+                ]}
+              />
+              <Bar dataKey="series" name="Séries" fill={CORES.ferrugem} radius={[4, 4, 0, 0]} maxBarSize={36} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+
+      <div className="cartao">
+        <p className="nome-exercicio">Calorias por treino de musculação</p>
+        <p className="texto-secundario legenda-grafico">Calorias (kcal) informadas ao finalizar cada treino (últimos 12).</p>
+        {dadosCaloriasTreino.length === 0 ? (
+          <p className="texto-secundario">Finalize um treino informando as calorias gastas para ver o gráfico.</p>
+        ) : (
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={dadosCaloriasTreino} margin={{ top: 8, right: 8, left: -10, bottom: 0 }}>
+              <CartesianGrid stroke={CORES.borda} vertical={false} />
+              <XAxis dataKey="data" stroke={CORES.texto} fontSize={12} tickLine={false} />
+              <YAxis stroke={CORES.texto} fontSize={12} tickLine={false} width={48} />
+              <Tooltip
+                contentStyle={tooltipStyle}
+                labelStyle={{ color: CORES.texto }}
+                cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
+                itemStyle={{ color: '#edeef0' }}
+                formatter={(valor, _nome, item) => {
+                  const extras = [
+                    item.payload.duracao != null ? `${item.payload.duracao} min` : null,
+                    item.payload.intensidade ? INTENSIDADE_ROTULO[item.payload.intensidade] ?? item.payload.intensidade : null,
+                  ].filter(Boolean).join(' · ')
+                  return [`${valor} kcal${extras ? ` (${extras})` : ''}`, 'Gasto']
+                }}
+              />
+              <Bar dataKey="calorias" name="Calorias" fill={CORES.aco} radius={[4, 4, 0, 0]} maxBarSize={36} />
             </BarChart>
           </ResponsiveContainer>
         )}

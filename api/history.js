@@ -1,12 +1,16 @@
 import { sql } from './_lib/db.js'
 import { requireAuth } from './_lib/auth.js'
+import { garantirColunasSessao } from './_lib/sessao.js'
 
 export default async function handler(req, res) {
   try {
     const userId = requireAuth(req)
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
 
-    const treinos = await sql`select id, data::text as data from workouts where user_id = ${userId} order by data desc`
+    await garantirColunasSessao()
+    const treinos = await sql`
+      select id, data::text as data, duracao_min, calorias_total, intensidade
+      from workouts where user_id = ${userId} order by data desc`
     const series = await sql`
       select ws.id, ws.workout_id, ws.exercise_id, ws.numero_serie, ws.carga_kg, ws.repeticoes, ws.tempo_min, ws.calorias,
              e.nome as exercicio_nome
