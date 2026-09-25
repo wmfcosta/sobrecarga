@@ -55,6 +55,9 @@ export const api = {
   getMyPlan: () => request('/plans', { auth: true }),
   getStudentPlan: (alunoId) => request(`/plans?aluno_id=${encodeURIComponent(alunoId)}`, { auth: true }),
   savePlan: (payload) => request('/plans', { method: 'POST', body: payload, auth: true }),
+  getPlanTemplates: () => request('/plans?modelos=1', { auth: true }),
+  activatePlanTemplate: (modelo, alunoId) =>
+    request('/plans', { method: 'POST', body: { modelo, aluno_id: alunoId }, auth: true }),
   deletePlan: (id) => request(`/plans?id=${encodeURIComponent(id)}`, { method: 'DELETE', auth: true }),
   getToken,
   setToken,
