@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
 import { useAuth } from '../lib/AuthContext'
+import CartaoNotificacoes from '../components/CartaoNotificacoes'
 
 export default function Perfil() {
   const { profile, atualizarPerfil } = useAuth()
@@ -106,6 +107,8 @@ export default function Perfil() {
           </button>
         </form>
       )}
+
+      <CartaoNotificacoes />
     </div>
   )
 }

@@ -9,17 +9,17 @@ function formatar(ms) {
 }
 
 export default function BarraDescanso() {
-  const { descanso, restanteMs, encerrado, permissao, cancelar, adicionarSegundos } = useDescanso()
+  const { descanso, restanteMs, encerrado, contagemFinal, permissao, cancelar, adicionarSegundos } = useDescanso()
   if (!descanso) return null
 
   const progresso = descanso.duracaoMs ? 1 - restanteMs / descanso.duracaoMs : 1
 
   return (
-    <div className={`barra-descanso${encerrado ? ' barra-descanso-fim' : ''}`} role="timer" aria-live="polite">
+    <div className={`barra-descanso${encerrado ? ' barra-descanso-fim' : ''}${contagemFinal ? ' barra-descanso-alerta' : ''}`} role="timer" aria-live="polite">
       <div className="barra-descanso-progresso" style={{ transform: `scaleX(${Math.min(1, Math.max(0, progresso))})` }} />
       <div className="barra-descanso-conteudo">
         <div className="barra-descanso-info">
-          <span className="barra-descanso-titulo">{encerrado ? 'Descanso encerrado' : 'Descansando'}</span>
+          <span className="barra-descanso-titulo">{encerrado ? 'Descanso encerrado' : contagemFinal ? 'Prepare-se!' : 'Descansando'}</span>
           {descanso.rotulo && <span className="barra-descanso-rotulo">{encerrado ? 'Próxima: ' : 'Depois: '}{descanso.rotulo}</span>}
           {permissao === 'denied' && !encerrado && (
             <span className="barra-descanso-rotulo">Notificações bloqueadas no navegador</span>

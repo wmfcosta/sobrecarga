@@ -1,9 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
+import { api } from './api'
+import { garantirInscricaoPush } from './push'
 
 // Cronômetro de descanso entre séries.
 // O estado (horário de término) fica no localStorage, então o cronômetro
 // sobrevive a troca de tela e recarregamento da página. A notificação é
-// agendada no service worker para chegar mesmo com o app em segundo plano.
+// enviada pelo servidor (Web Push): aviso aos 5s finais e no fim do descanso,
+// mesmo com a tela bloqueada. O agendamento local no service worker fica de reserva.
 
 const CHAVE = 'sobrecarga_descanso'
 const DescansoContext = createContext(null)
@@ -40,6 +43,12 @@ async function enviarAoServiceWorker(mensagem) {
   } catch {
     return false
   }
+}
+
+function agendarNoServidor(fimEm, corpo) {
+  garantirInscricaoPush()
+    .then((ok) => (ok ? api.pushDescanso(fimEm, corpo) : null))
+    .catch(() => {})
 }
 
 export function DescansoProvider({ children }) {
@@ -85,6 +94,32 @@ export function DescansoProvider({ children }) {
     }
   }, [])
 
+  // Bipe curto da contagem regressiva (últimos 5 segundos)
+  const tocarBipe = useCallback((frequencia = 660) => {
+    try {
+      const ctx = audioRef.current
+      if (ctx) {
+        const osc = ctx.createOscillator()
+        const ganho = ctx.createGain()
+        osc.type = 'sine'
+        osc.frequency.value = frequencia
+        ganho.gain.setValueAtTime(0.0001, ctx.currentTime)
+        ganho.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + 0.01)
+        ganho.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.12)
+        osc.connect(ganho).connect(ctx.destination)
+        osc.start()
+        osc.stop(ctx.currentTime + 0.15)
+      }
+    } catch {
+      // sem áudio disponível
+    }
+    try {
+      navigator.vibrate?.(80)
+    } catch {
+      // sem vibração
+    }
+  }, [])
+
   const iniciar = useCallback(
     async (minutos, rotulo) => {
       const duracaoMs = Math.round(Number(minutos) * 60 * 1000)
@@ -114,11 +149,9 @@ export function DescansoProvider({ children }) {
       const novo = { fimEm, duracaoMs, rotulo, alertado: false }
       atualizar(novo)
       setAgora(Date.now())
-      swAgendou.current = await enviarAoServiceWorker({
-        tipo: 'agendar-descanso',
-        fimEm,
-        corpo: rotulo ? `Próxima série: ${rotulo}` : 'Hora da próxima série!',
-      })
+      const corpo = rotulo ? `Próxima série: ${rotulo}` : 'Hora da próxima série!'
+      agendarNoServidor(fimEm, corpo)
+      swAgendou.current = await enviarAoServiceWorker({ tipo: 'agendar-descanso', fimEm, corpo })
     },
     [atualizar]
   )
@@ -126,6 +159,7 @@ export function DescansoProvider({ children }) {
   const cancelar = useCallback(() => {
     atualizar(null)
     enviarAoServiceWorker({ tipo: 'cancelar-descanso' })
+    api.pushCancelar().catch(() => {})
   }, [atualizar])
 
   const adicionarSegundos = useCallback(
@@ -140,11 +174,9 @@ export function DescansoProvider({ children }) {
           alertado: false,
         }
         salvar(novo)
-        enviarAoServiceWorker({
-          tipo: 'agendar-descanso',
-          fimEm: novo.fimEm,
-          corpo: novo.rotulo ? `Próxima série: ${novo.rotulo}` : 'Hora da próxima série!',
-        })
+        const corpo = novo.rotulo ? `Próxima série: ${novo.rotulo}` : 'Hora da próxima série!'
+        enviarAoServiceWorker({ tipo: 'agendar-descanso', fimEm: novo.fimEm, corpo })
+        agendarNoServidor(novo.fimEm, corpo)
         return novo
       })
     },
@@ -167,6 +199,21 @@ export function DescansoProvider({ children }) {
     document.addEventListener('visibilitychange', aoVoltar)
     return () => document.removeEventListener('visibilitychange', aoVoltar)
   }, [])
+
+  // Contagem regressiva: bipe curto e vibração a cada segundo nos últimos 5s
+  const ultimoSegundoRef = useRef(null)
+  useEffect(() => {
+    if (!descanso || descanso.alertado) {
+      ultimoSegundoRef.current = null
+      return
+    }
+    const restante = descanso.fimEm - agora
+    if (restante <= 0 || restante > 5000) return
+    const segundo = Math.ceil(restante / 1000)
+    if (ultimoSegundoRef.current === `${descanso.fimEm}:${segundo}`) return
+    ultimoSegundoRef.current = `${descanso.fimEm}:${segundo}`
+    if (document.visibilityState === 'visible') tocarBipe()
+  }, [agora, descanso, tocarBipe])
 
   // Chegou a zero: alarme na tela (e notificação direta se não houver service worker)
   useEffect(() => {
@@ -193,6 +240,7 @@ export function DescansoProvider({ children }) {
     descanso,
     restanteMs,
     encerrado: !!descanso && restanteMs === 0,
+    contagemFinal: !!descanso && restanteMs > 0 && restanteMs <= 5000,
     permissao,
     iniciar,
     cancelar,

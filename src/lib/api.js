@@ -58,6 +58,11 @@ export const api = {
   getPlanTemplates: () => request('/plans?modelos=1', { auth: true }),
   activatePlanTemplate: (modelo, alunoId) =>
     request('/plans', { method: 'POST', body: { modelo, aluno_id: alunoId }, auth: true }),
+  pushChave: () => request('/profile?push=chave', { auth: true }),
+  pushInscrever: (inscricao) => request('/profile?push=inscrever', { method: 'POST', body: { inscricao }, auth: true }),
+  pushTeste: () => request('/profile?push=teste', { method: 'POST', body: {}, auth: true }),
+  pushDescanso: (fimEm, corpo) => request('/profile?push=descanso', { method: 'POST', body: { fimEm, corpo }, auth: true }),
+  pushCancelar: () => request('/profile?push=cancelar', { method: 'POST', body: {}, auth: true }),
   deletePlan: (id) => request(`/plans?id=${encodeURIComponent(id)}`, { method: 'DELETE', auth: true }),
   getToken,
   setToken,

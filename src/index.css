@@ -1356,3 +1356,8 @@ button, input, select {
 }
 
 .menu-sair:hover { color: var(--ferrugem); }
+
+/* Últimos 5 segundos do descanso */
+.barra-descanso-alerta { border-color: #f5b83d; animation: pulso-alerta 1s ease-in-out infinite; }
+.barra-descanso-alerta .barra-descanso-tempo { color: #f5b83d; }
+@keyframes pulso-alerta { 50% { box-shadow: 0 0 0 5px rgba(245, 184, 61, 0.35); } }

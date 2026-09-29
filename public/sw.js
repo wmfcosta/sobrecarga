@@ -52,6 +52,33 @@ self.addEventListener('message', (event) => {
   }
 })
 
+// ---------- Notificações enviadas pelo servidor (Web Push) ----------
+// Chegam mesmo com a tela bloqueada ou o app fechado (Android e iPhone com o
+// app instalado na tela inicial).
+self.addEventListener('push', (event) => {
+  let dados = {}
+  try {
+    dados = event.data ? event.data.json() : {}
+  } catch {
+    dados = { titulo: 'Sobrecarga', corpo: event.data ? event.data.text() : '' }
+  }
+  const aviso = dados.tipo === 'descanso-aviso'
+  const fim = dados.tipo === 'descanso-fim'
+  if (fim || aviso) cancelarAgendamento() // o servidor assumiu; evita aviso duplicado local
+  event.waitUntil(
+    self.registration.showNotification(dados.titulo || 'Sobrecarga', {
+      body: dados.corpo || '',
+      tag: fim || aviso ? 'descanso' : 'sobrecarga',
+      renotify: true,
+      requireInteraction: fim,
+      silent: false,
+      vibrate: aviso ? [200, 100, 200] : [400, 150, 400, 150, 400],
+      icon: '/icone-192.png',
+      badge: '/icone-96.png',
+    })
+  )
+})
+
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
   event.waitUntil(
