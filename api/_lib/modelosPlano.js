@@ -110,3 +110,95 @@ export function resumoModelos() {
     })),
   }))
 }
+
+// ---------- Estrutura série a série (usada na tela de Treino do dia) ----------
+// tipo: aquecimento | feeder | working | backoff. `nota` descreve a técnica da série
+// (cluster, drop set, rest-pause, parciais). A ordem das linhas é a ordem de execução.
+
+const aq = { tipo: 'aquecimento', reps: '15-20' }
+const fd = { tipo: 'feeder', reps: '5-6' }
+const wk = (reps = '10-12', nota) => (nota ? { tipo: 'working', reps, nota } : { tipo: 'working', reps })
+const bo = (reps = '10-12') => ({ tipo: 'backoff', reps })
+const CLUSTER = wk('3-4', 'Cluster: 3-4 blocos de 3-4 reps, 20s entre blocos')
+const DROP = wk('6-6-6', 'Drop set: 6 reps, reduz a carga, 6, reduz, 6 (18 no total)')
+const REST_PAUSE = wk('4+4+4', 'Rest-pause: 3 blocos de 4 reps, 5s de pausa')
+const w3 = [wk(), wk(), wk()]
+
+const ESTRUTURA_AVANCADO = [
+  // Treino A - Peito e Tríceps
+  [
+    [aq, aq, fd, fd, wk('6-8'), CLUSTER, bo()],
+    [fd, fd, wk('8-10'), wk('8-10'), bo()],
+    [fd, fd, wk('8-10'), CLUSTER, bo()],
+    [fd, wk(), wk(), DROP],
+    [fd, ...w3],
+    [fd, ...w3],
+    [fd, ...w3],
+    [fd, wk(), wk(), DROP],
+  ],
+  // Treino B - Quadríceps e Panturrilha
+  [
+    [aq, aq, fd, ...w3],
+    [fd, ...w3, bo()],
+    [fd, fd, wk(), wk(), bo()],
+    [fd, ...w3],
+    [fd, wk(), wk(), DROP],
+    [fd, ...w3],
+    [fd, ...w3],
+    [wk('15-20'), wk('15-20'), wk('15-20'), wk('15-20')],
+    [wk('20-25'), wk('20-25'), wk('20-25'), wk('20-25')],
+  ],
+  // Treino C - Costas e Bíceps
+  [
+    [aq, aq, fd, fd, wk(), wk(), bo('12-15')],
+    [fd, wk(), wk(), bo('12-15')],
+    [fd, wk(), wk(), bo('12-15')],
+    [fd, wk(), wk(), REST_PAUSE],
+    [fd, wk(), wk(), DROP],
+    [fd, ...w3],
+    [fd, ...w3],
+    [fd, ...w3],
+  ],
+  // Treino D - Posteriores e Glúteo
+  [
+    [aq, aq, fd, ...w3],
+    [fd, ...w3],
+    [fd, fd, wk(), wk(), bo()],
+    [fd, ...w3],
+    [fd, wk(), CLUSTER, bo()],
+    [fd, ...w3, REST_PAUSE],
+    [wk('15-20'), wk('15-20'), wk('15-20'), wk('15-20')],
+    [wk('15-20'), wk('15-20'), wk('15-20'), wk('15-20')],
+  ],
+  // Treino E - Ombros e Braços
+  [
+    [aq, aq, fd, fd, wk('6-8'), CLUSTER, bo()],
+    [fd, ...w3],
+    [fd, ...w3],
+    [fd, ...w3],
+    [fd, ...w3],
+    [fd, ...w3],
+    [fd, wk(), wk(), DROP],
+    [fd, ...w3],
+    [fd, wk(), wk(), DROP],
+    [fd, ...[1, 2, 3].map(() => wk('10-12', '+ 10 reps parciais em alongamento'))],
+  ],
+]
+
+MODELOS_PLANO.avancado.dias.forEach((dia, i) => {
+  dia.exercicios.forEach((ex, j) => {
+    ex.estrutura = ESTRUTURA_AVANCADO[i][j]
+  })
+})
+
+// Estrutura de um exercício de um plano ativado a partir de um modelo
+export function estruturaDoModelo(modeloId, indiceDia, indiceExercicio) {
+  return MODELOS_PLANO[modeloId]?.dias[indiceDia]?.exercicios[indiceExercicio]?.estrutura ?? null
+}
+
+// Descobre o modelo de um plano (planos antigos não guardavam o modelo, só o nome)
+export function modeloDoPlano(plano) {
+  if (plano?.modelo && MODELOS_PLANO[plano.modelo]) return plano.modelo
+  const encontrado = Object.values(MODELOS_PLANO).find((m) => m.nome === plano?.nome)
+  return encontrado?.id ?? null
+}

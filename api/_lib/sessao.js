@@ -13,3 +13,18 @@ export function garantirColunasSessao() {
   })().catch((e) => { colunasProntas = null; throw e })
   return colunasProntas
 }
+
+// Colunas do "plano como treino do dia": modelo do plano, estrutura das séries
+// prescritas, dia do plano usado no treino e tipo de cada série registrada.
+let colunasPlanoProntas = null
+export function garantirColunasPlano() {
+  colunasPlanoProntas ??= (async () => {
+    await sql`alter table plans add column if not exists modelo text`
+    await sql`alter table plan_exercises add column if not exists series_detalhe jsonb`
+    await sql`alter table workouts add column if not exists plan_day_id uuid`
+    await sql`alter table workout_sets add column if not exists tipo_serie text`
+  })().catch((e) => { colunasPlanoProntas = null; throw e })
+  return colunasPlanoProntas
+}
+
+export const TIPOS_SERIE = ['aquecimento', 'feeder', 'working', 'backoff']

@@ -1,26 +1,30 @@
 import { sql } from './_lib/db.js'
 import { requireAuth } from './_lib/auth.js'
+import { garantirColunasPlano, TIPOS_SERIE } from './_lib/sessao.js'
+
+const tipoValido = (t) => (TIPOS_SERIE.includes(t) ? t : null)
 
 export default async function handler(req, res) {
   try {
     const userId = requireAuth(req)
+    await garantirColunasPlano()
 
     if (req.method === 'POST') {
-      const { workout_id, exercise_id, numero_serie, carga_kg, repeticoes, tempo_min, calorias } = req.body || {}
+      const { workout_id, exercise_id, numero_serie, carga_kg, repeticoes, tempo_min, calorias, tipo_serie } = req.body || {}
       if (!workout_id || !exercise_id) return res.status(400).json({ error: 'Dados incompletos.' })
 
       const dono = await sql`select id from workouts where id = ${workout_id} and user_id = ${userId}`
       if (dono.length === 0) return res.status(403).json({ error: 'Não autorizado.' })
 
       const criados = await sql`
-        insert into workout_sets (workout_id, exercise_id, numero_serie, carga_kg, repeticoes, tempo_min, calorias)
-        values (${workout_id}, ${exercise_id}, ${numero_serie || 1}, ${carga_kg ?? null}, ${repeticoes ?? null}, ${tempo_min ?? null}, ${calorias ?? null})
+        insert into workout_sets (workout_id, exercise_id, numero_serie, carga_kg, repeticoes, tempo_min, calorias, tipo_serie)
+        values (${workout_id}, ${exercise_id}, ${numero_serie || 1}, ${carga_kg ?? null}, ${repeticoes ?? null}, ${tempo_min ?? null}, ${calorias ?? null}, ${tipoValido(tipo_serie)})
         returning id`
       return res.status(200).json(criados[0])
     }
 
     if (req.method === 'PUT') {
-      const { id, numero_serie, carga_kg, repeticoes, tempo_min, calorias } = req.body || {}
+      const { id, numero_serie, carga_kg, repeticoes, tempo_min, calorias, tipo_serie } = req.body || {}
       if (!id) return res.status(400).json({ error: 'Informe o id.' })
 
       const dono = await sql`
@@ -35,7 +39,8 @@ export default async function handler(req, res) {
           carga_kg = ${carga_kg ?? null},
           repeticoes = ${repeticoes ?? null},
           tempo_min = ${tempo_min ?? null},
-          calorias = ${calorias ?? null}
+          calorias = ${calorias ?? null},
+          tipo_serie = case when ${tipo_serie === undefined} then tipo_serie else ${tipoValido(tipo_serie)} end
         where id = ${id}`
       return res.status(200).json({ ok: true })
     }

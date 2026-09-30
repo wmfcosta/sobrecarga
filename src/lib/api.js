@@ -38,6 +38,8 @@ export const api = {
     request('/exercises', { method: 'POST', body: { nome, grupo_muscular }, auth: true }),
   getWorkout: (data) => request(`/workouts?data=${encodeURIComponent(data)}`, { auth: true }),
   ensureWorkout: (data) => request('/workouts', { method: 'POST', body: { data }, auth: true }),
+  usarPlanoNoDia: (data, planDayId) => request('/workouts', { method: 'PATCH', body: { acao: 'usar-plano', data, plan_day_id: planDayId }, auth: true }),
+  removerPlanoDoDia: (data) => request('/workouts', { method: 'PATCH', body: { acao: 'remover-plano', data }, auth: true }),
   iniciarTreino: (data) => request('/workouts', { method: 'PATCH', body: { acao: 'iniciar', data }, auth: true }),
   finalizarTreino: (payload) => request('/workouts', { method: 'PATCH', body: { acao: 'finalizar', ...payload }, auth: true }),
   editarTreino: (payload) => request('/workouts', { method: 'PATCH', body: { acao: 'editar', ...payload }, auth: true }),

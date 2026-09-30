@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../lib/api'
+import CartaoTreinoDeHoje from '../components/CartaoTreinoDeHoje'
 
 function DiaDoPlano({ dia }) {
   return (
@@ -84,6 +85,8 @@ export default function Plano() {
             <p className="nome-exercicio">{plano.nome}</p>
             {plano.personal_nome && <p className="texto-secundario">Prescrito por {plano.personal_nome}</p>}
           </div>
+
+          <CartaoTreinoDeHoje key={plano.id} plano={plano} />
 
           {plano.dias.map((dia) => <DiaDoPlano key={dia.id} dia={dia} />)}
 

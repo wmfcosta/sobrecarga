@@ -1,29 +1,39 @@
 import { sql } from './_lib/db.js'
 import { requireAuth } from './_lib/auth.js'
-import { MODELOS_PLANO, norm, resumoModelos } from './_lib/modelosPlano.js'
+import { MODELOS_PLANO, norm, resumoModelos, estruturaDoModelo, modeloDoPlano } from './_lib/modelosPlano.js'
+import { garantirColunasPlano } from './_lib/sessao.js'
 
 async function carregarPlanoCompleto(planoId) {
-  const planos = await sql`select id, aluno_id, personal_id, nome, ativo from plans where id = ${planoId}`
+  await garantirColunasPlano()
+  const planos = await sql`select id, aluno_id, personal_id, nome, ativo, modelo from plans where id = ${planoId}`
   const plano = planos[0]
   if (!plano) return null
+  plano.modelo = modeloDoPlano(plano)
 
   const dias = await sql`
     select id, rotulo, ordem from plan_days where plan_id = ${plano.id} order by ordem`
-  for (const dia of dias) {
+  for (const [i, dia] of dias.entries()) {
     dia.exercicios = await sql`
-      select id, exercicio_nome, series_alvo, repeticoes_alvo, carga_alvo_kg, observacoes, ordem
+      select id, exercicio_nome, series_alvo, repeticoes_alvo, carga_alvo_kg, observacoes, ordem, series_detalhe
       from plan_exercises where plan_day_id = ${dia.id} order by ordem`
+    // Planos ativados antes de existir a estrutura: completa a partir do modelo
+    if (plano.modelo) {
+      dia.exercicios.forEach((ex, j) => {
+        ex.series_detalhe ??= estruturaDoModelo(plano.modelo, i, j)
+      })
+    }
   }
   plano.dias = dias
   return plano
 }
 
-async function criarPlano(alunoId, personalId, nome, dias) {
+async function criarPlano(alunoId, personalId, nome, dias, modelo = null) {
+  await garantirColunasPlano()
   await sql`update plans set ativo = false where aluno_id = ${alunoId} and ativo`
 
   const criados = await sql`
-    insert into plans (aluno_id, personal_id, nome, ativo)
-    values (${alunoId}, ${personalId}, ${nome}, true)
+    insert into plans (aluno_id, personal_id, nome, ativo, modelo)
+    values (${alunoId}, ${personalId}, ${nome}, true, ${modelo})
     returning id`
   const planId = criados[0].id
 
@@ -41,10 +51,11 @@ async function criarPlano(alunoId, personalId, nome, dias) {
       if (!ex.exercicio_nome) continue
       await sql`
         insert into plan_exercises (
-          plan_day_id, exercicio_nome, series_alvo, repeticoes_alvo, carga_alvo_kg, observacoes, ordem
+          plan_day_id, exercicio_nome, series_alvo, repeticoes_alvo, carga_alvo_kg, observacoes, ordem, series_detalhe
         ) values (
           ${diaId}, ${ex.exercicio_nome.trim()}, ${ex.series_alvo || null},
-          ${ex.repeticoes_alvo || null}, ${ex.carga_alvo_kg || null}, ${ex.observacoes || null}, ${j}
+          ${ex.repeticoes_alvo || null}, ${ex.carga_alvo_kg || null}, ${ex.observacoes || null}, ${j},
+          ${ex.series_detalhe ? JSON.stringify(ex.series_detalhe) : null}
         )`
     }
   }
@@ -83,6 +94,7 @@ async function resolverExerciciosDoModelo(modelo, userId) {
       series_alvo: ex.series,
       repeticoes_alvo: ex.reps,
       observacoes: ex.obs,
+      series_detalhe: ex.estrutura || null,
     })),
   }))
   return { dias, criados }
@@ -117,6 +129,19 @@ export default async function handler(req, res) {
 
       const plano = await carregarPlanoCompleto(planosAtivos[0].id)
       plano.personal_nome = planosAtivos[0].personal_nome
+
+      // Próximo treino da sequência: o dia seguinte ao último usado como treino do dia
+      const ids = plano.dias.map((d) => d.id)
+      const usados = ids.length
+        ? await sql`
+            select plan_day_id, data::text as data from workouts
+            where user_id = ${alunoAlvo} and plan_day_id = any(${ids})
+            order by data desc limit 1`
+        : []
+      const ultimo = usados[0]
+      const indiceUltimo = ultimo ? ids.indexOf(ultimo.plan_day_id) : -1
+      plano.proximo_dia_id = ids.length ? ids[(indiceUltimo + 1) % ids.length] : null
+      plano.ultimo_uso = ultimo ? { plan_day_id: ultimo.plan_day_id, data: ultimo.data } : null
       return res.status(200).json(plano)
     }
 
@@ -138,7 +163,7 @@ export default async function handler(req, res) {
       }
 
       const { dias, criados } = await resolverExerciciosDoModelo(modelo, userId)
-      const planId = await criarPlano(alunoAlvo, personalId, modelo.nome, dias)
+      const planId = await criarPlano(alunoAlvo, personalId, modelo.nome, dias, modelo.id)
       const plano = await carregarPlanoCompleto(planId)
       plano.exercicios_criados = criados
       return res.status(200).json(plano)

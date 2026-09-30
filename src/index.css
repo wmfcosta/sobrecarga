@@ -1361,3 +1361,31 @@ button, input, select {
 .barra-descanso-alerta { border-color: #f5b83d; animation: pulso-alerta 1s ease-in-out infinite; }
 .barra-descanso-alerta .barra-descanso-tempo { color: #f5b83d; }
 @keyframes pulso-alerta { 50% { box-shadow: 0 0 0 5px rgba(245, 184, 61, 0.35); } }
+
+/* Treino do dia gerado pelo plano */
+.treino-de-hoje { display: flex; flex-direction: column; gap: 10px; }
+.treino-do-plano { display: flex; flex-direction: column; gap: 12px; }
+.treino-do-plano-cabecalho { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.treino-do-plano-cabecalho > div { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.titulo-extra { margin: 8px 0 0; font-size: 16px; color: var(--texto-secundario); }
+.exercicio-plano { display: flex; flex-direction: column; gap: 8px; }
+.exercicio-plano-topo { display: flex; gap: 10px; align-items: center; }
+.exercicio-plano-topo p { margin: 0; }
+.lista-plano { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.linha-plano { border: 1px solid var(--borda); border-left-width: 3px; border-radius: 8px; padding: 6px 8px; display: flex; flex-direction: column; gap: 4px; }
+.linha-plano-feita { background: var(--superficie-alta); }
+.linha-tipo-aquecimento { border-left-color: #f5d33d; }
+.linha-tipo-feeder { border-left-color: #f5a33d; }
+.linha-tipo-working { border-left-color: var(--ferrugem); }
+.linha-tipo-backoff { border-left-color: #9b5cf6; }
+.linha-plano-grade { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 64px; gap: 6px; align-items: center; }
+.linha-plano-rotulo { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.linha-plano-rotulo select { background: var(--superficie); color: var(--texto); border: 1px solid var(--borda); border-radius: 6px; padding: 4px 6px; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+.linha-plano-rotulo small { font-size: 12px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.linha-plano-nome { font-size: 13px; font-weight: 600; }
+.linha-plano-grade input { width: 100%; min-width: 0; padding: 8px 6px; font-size: 15px; text-align: center; background: var(--superficie); color: var(--texto); border: 1px solid var(--borda); border-radius: 6px; font-family: var(--fonte-dado); }
+.botao-linha-plano { height: 38px; border-radius: 6px; border: 1px solid var(--ferrugem); background: var(--ferrugem); color: #fff; font-weight: 700; font-size: 13px; cursor: pointer; padding: 0 4px; }
+.botao-linha-plano:disabled { opacity: 0.45; cursor: default; }
+.botao-linha-plano.feito { background: transparent; color: #3ecf8e; border-color: #3ecf8e; opacity: 1; font-size: 18px; }
+.linha-plano-rodape { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.linha-plano-nota { color: var(--texto-secundario); font-size: 11px; line-height: 1.35; }

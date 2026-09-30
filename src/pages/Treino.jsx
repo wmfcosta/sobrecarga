@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { api } from '../lib/api'
 import { dataLocalISO } from '../lib/datas'
 import VisualizadorGif from '../components/VisualizadorGif'
 import { DicaDescanso } from '../components/BarraDescanso'
 import SugestaoFullBody from '../components/SugestaoFullBody'
 import SessaoTreino from '../components/SessaoTreino'
+import TreinoDoPlano from '../components/TreinoDoPlano'
 import { useAuth } from '../lib/AuthContext'
 import { useDescanso } from '../lib/DescansoContext'
 
@@ -21,6 +22,8 @@ export default function Treino() {
   const [data, setData] = useState(searchParams.get('data') || hoje())
   const [treino, setTreino] = useState(null)
   const [series, setSeries] = useState([])
+  const [planoDia, setPlanoDia] = useState(null)
+  const navigate = useNavigate()
   const [exercicios, setExercicios] = useState([])
   const [carregando, setCarregando] = useState(true)
 
@@ -76,6 +79,7 @@ export default function Treino() {
     const resposta = await api.getWorkout(data)
     setTreino(resposta.treino)
     setSeries(resposta.series ?? [])
+    setPlanoDia(resposta.plano_dia ?? null)
     setCarregando(false)
     return resposta.series ?? []
   }
@@ -185,7 +189,24 @@ export default function Treino() {
     carregarTreinoDoDia()
   }
 
-  const porExercicio = series.reduce((acc, s) => {
+  // Série de uma linha do treino do plano
+  async function registrarDoPlano(payload, proxima) {
+    // Inicia o descanso ainda dentro do toque (libera som/notificação no celular)
+    if (descansoMin > 0) iniciarDescanso(descansoMin, proxima)
+    const t = await garantirTreino()
+    if (!t) return
+    await api.createSet({ workout_id: t.id, ...payload })
+    await carregarTreinoDoDia()
+  }
+
+  async function atualizarDoPlano(payload) {
+    await api.updateSet(payload)
+    await carregarTreinoDoDia()
+  }
+
+  const idsDoPlano = new Set((planoDia?.exercicios ?? []).map((ex) => ex.exercise_id).filter(Boolean))
+
+  const porExercicio = series.filter((s) => !idsDoPlano.has(s.exercise_id)).reduce((acc, s) => {
     const chave = s.exercise_id
     if (!acc[chave]) acc[chave] = { nome: s.exercicio_nome, grupo: s.grupo_muscular, sets: [] }
     acc[chave].sets.push(s)
@@ -221,6 +242,19 @@ export default function Treino() {
         />
       )}
 
+      {!carregando && planoDia && (
+        <TreinoDoPlano
+          planoDia={planoDia}
+          series={series}
+          onRegistrar={registrarDoPlano}
+          onAtualizar={atualizarDoPlano}
+          onRemover={removerSerie}
+          onTrocar={() => navigate('/plano')}
+          onGif={setGifAmpliado}
+        />
+      )}
+
+      {planoDia && <h2 className="titulo-extra">Exercício extra</h2>}
       <form ref={formRef} onSubmit={registrarSerie} className="cartao form-serie">
         {editandoId && (
           <div className="aviso-edicao">
@@ -290,7 +324,7 @@ export default function Treino() {
       {carregando ? (
         <p className="texto-secundario">Carregando...</p>
       ) : Object.keys(porExercicio).length === 0 ? (
-        <p className="texto-secundario">Nenhuma série registrada neste dia ainda.</p>
+        !planoDia && <p className="texto-secundario">Nenhuma série registrada neste dia ainda.</p>
       ) : (
         <div className="grupo-series">
           {Object.entries(porExercicio).map(([id, grupo]) => (
