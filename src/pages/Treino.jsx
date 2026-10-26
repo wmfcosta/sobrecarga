@@ -14,6 +14,30 @@ function hoje() {
   return dataLocalISO()
 }
 
+// Rascunho do formulário (exercício, carga, reps...). Fica salvo no aparelho porque,
+// durante o descanso com a tela bloqueada, o celular pode descarregar o app; ao
+// voltar, a tela recarrega e sem isso o exercício escolhido se perdia.
+const CHAVE_RASCUNHO = 'sobrecarga_rascunho_serie'
+const VALIDADE_RASCUNHO_MS = 12 * 60 * 60 * 1000
+
+function lerRascunho() {
+  try {
+    const r = JSON.parse(localStorage.getItem(CHAVE_RASCUNHO) || 'null')
+    if (!r || Date.now() - (r.salvoEm || 0) > VALIDADE_RASCUNHO_MS) return null
+    return r
+  } catch {
+    return null
+  }
+}
+
+function salvarRascunho(rascunho) {
+  try {
+    localStorage.setItem(CHAVE_RASCUNHO, JSON.stringify({ ...rascunho, salvoEm: Date.now() }))
+  } catch {
+    // armazenamento indisponível: o formulário funciona só em memória
+  }
+}
+
 export default function Treino() {
   const { profile } = useAuth()
   const { iniciar: iniciarDescanso } = useDescanso()
@@ -47,12 +71,29 @@ export default function Treino() {
   useEffect(() => {
     api.listExercises().then((data) => {
       setExercicios(data ?? [])
-      if (data?.length && !exercicioId) {
+      if (!data?.length || exercicioId) return
+      // Volta ao último exercício usado (e aos valores digitados), se ainda existir
+      const rascunho = lerRascunho()
+      const anterior = rascunho && data.find((ex) => ex.id === rascunho.exercicioId)
+      if (anterior) {
+        setExercicioId(anterior.id)
+        setBuscaExercicio(anterior.nome)
+        setCarga(rascunho.carga ?? '')
+        setRepeticoes(rascunho.repeticoes ?? '')
+        setTempoMin(rascunho.tempoMin ?? '')
+        setCalorias(rascunho.calorias ?? '')
+      } else {
         setExercicioId(data[0].id)
         setBuscaExercicio(data[0].nome)
       }
     })
   }, [])
+
+  // Guarda o rascunho a cada alteração (exceto durante a edição de uma série já salva)
+  useEffect(() => {
+    if (!exercicioId || editandoId) return
+    salvarRascunho({ exercicioId, carga, repeticoes, tempoMin, calorias })
+  }, [exercicioId, carga, repeticoes, tempoMin, calorias, editandoId])
 
   useEffect(() => {
     if (!fullbodyAtivo) return
@@ -176,7 +217,9 @@ export default function Treino() {
           ...payload,
         })
       }
-      limparFormulario()
+      // Após registrar, mantém exercício, carga e repetições prontos para a próxima série.
+      // Após editar, volta ao formulário limpo.
+      if (editandoId) limparFormulario()
       carregarTreinoDoDia()
     } catch (err) {
       // silenciosamente mantém o formulário para o usuário tentar de novo
