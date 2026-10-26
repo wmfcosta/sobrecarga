@@ -65,9 +65,24 @@ async function criarPlano(alunoId, personalId, nome, dias, modelo = null) {
 
 // Garante que cada exercício do modelo exista no cadastro. Reaproveita o exercício
 // já cadastrado (pelo nome ou por um alias) para manter o histórico de carga.
-async function resolverExerciciosDoModelo(modelo, userId) {
-  const cadastro = await sql`select id, nome from exercises`
-  const porNome = new Map(cadastro.map((ex) => [norm(ex.nome), ex.nome]))
+async function resolverExerciciosDoModelo(modelo, userId, alunoId = userId) {
+  // Quantas séries o usuário já registrou em cada exercício: quando nome e aliases
+  // existem no cadastro, fica o que tem mais histórico (a carga anterior aparece no treino)
+  const cadastro = await sql`
+    select e.id, e.nome, count(ws.id)::int as usos
+    from exercises e
+    left join workout_sets ws on ws.exercise_id = e.id
+      and ws.workout_id in (select id from workouts where user_id = ${alunoId})
+    group by e.id, e.nome`
+  const porNome = new Map()
+  const usos = new Map()
+  for (const ex of cadastro) {
+    const chave = norm(ex.nome)
+    if (!porNome.has(chave) || ex.usos > usos.get(chave)) {
+      porNome.set(chave, ex.nome)
+      usos.set(chave, ex.usos)
+    }
+  }
   const resolvidos = new Map()
   let criados = 0
 
@@ -75,7 +90,8 @@ async function resolverExerciciosDoModelo(modelo, userId) {
     for (const ex of dia.exercicios) {
       const chave = norm(ex.nome)
       if (resolvidos.has(chave)) continue
-      const candidato = [ex.nome, ...(ex.aliases || [])].map(norm).find((n) => porNome.has(n))
+      const candidato = [ex.nome, ...(ex.aliases || [])].map(norm).filter((n) => porNome.has(n))
+        .sort((x, y) => usos.get(y) - usos.get(x))[0]
       if (candidato) {
         resolvidos.set(chave, porNome.get(candidato))
         continue
@@ -162,7 +178,7 @@ export default async function handler(req, res) {
         personalId = userId
       }
 
-      const { dias, criados } = await resolverExerciciosDoModelo(modelo, userId)
+      const { dias, criados } = await resolverExerciciosDoModelo(modelo, userId, alunoAlvo)
       const planId = await criarPlano(alunoAlvo, personalId, modelo.nome, dias, modelo.id)
       const plano = await carregarPlanoCompleto(planId)
       plano.exercicios_criados = criados

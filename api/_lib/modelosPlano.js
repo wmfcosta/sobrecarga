@@ -202,3 +202,86 @@ export function modeloDoPlano(plano) {
   const encontrado = Object.values(MODELOS_PLANO).find((m) => m.nome === plano?.nome)
   return encontrado?.id ?? null
 }
+
+// ---------- "Progressão por grupo": dupla progressão, um grupo por dia ----------
+// Baseado no documento "Treinos de progressão de carga por grupo muscular".
+// Sem tipos de série: todas são séries de trabalho. Cada série leva a faixa de
+// repetições e o degrau de carga; a tela de treino usa isso para sugerir quando subir.
+function series(qtd, reps, degrau) {
+  return Array.from({ length: qtd }, () => ({ tipo: null, reps, degrau }))
+}
+function ex(nome, grupo, qtd, reps, degrau, aliases = []) {
+  const max = reps.split('-').at(-1)
+  return {
+    nome, grupo, aliases, series: qtd, reps,
+    obs: `${qtd} × ${reps} reps. Sobe +${String(degrau).replace('.', ',')} kg quando fizer ${qtd} × ${max} com boa técnica. Pare 1 a 2 reps antes da falha.`,
+    estrutura: series(qtd, reps, degrau),
+  }
+}
+
+MODELOS_PLANO.progressao = {
+  id: 'progressao',
+  nome: 'Progressão por grupo',
+  descricao:
+    '6 treinos, um grupo por dia: Peito, Costas, Pernas A, Ombros, Bíceps e tríceps, Pernas B. ' +
+    'Dupla progressão: suba as repetições até o topo da faixa em todas as séries, então suba um degrau de carga. ' +
+    'A cada treino o app sugere a carga a partir do seu último registro. Semana leve (metade das séries) a cada 6 a 8 semanas.',
+  dias: [
+    {
+      rotulo: 'Peito',
+      exercicios: [
+        ex('Supino inclinado máquina', 'Peito', 3, '8-12', 5, ['Supino Inclinado Maquina']),
+        ex('Supino máquina', 'Peito', 3, '8-12', 5, ['Supino Maquina']),
+        ex('Peck Deck', 'Peito', 3, '10-15', 5),
+        ex('Crossover polia alta', 'Peito', 2, '12-15', 2.5, ['Croos Over Polia Alta']),
+      ],
+    },
+    {
+      rotulo: 'Costas',
+      exercicios: [
+        ex('Puxada alta supinada aberta', 'Costas', 3, '8-12', 5),
+        ex('Remada baixa sentada', 'Costas', 3, '8-12', 5, ['Remada Baixa Sentada']),
+        ex('Pulldown', 'Costas', 3, '10-15', 5, ['Pull dow', 'Pull down']),
+        ex('Puxada unilateral', 'Costas', 2, '10-12', 2.5, ['Puxada Unilateral']),
+      ],
+    },
+    {
+      rotulo: 'Pernas A',
+      exercicios: [
+        ex('Leg press', 'Pernas', 3, '10-15', 10, ['Leg press H']),
+        ex('Cadeira extensora', 'Pernas', 3, '10-15', 5),
+        ex('Cadeira flexora', 'Pernas', 3, '10-15', 5),
+        ex('Panturrilha em pé', 'Panturrilha', 3, '12-20', 5),
+      ],
+    },
+    {
+      rotulo: 'Ombros',
+      exercicios: [
+        ex('Desenvolvimento lateral máquina', 'Ombro', 3, '8-12', 5, ['Desenvolvimento Lateral máquina']),
+        ex('Elevação lateral com halteres', 'Ombro', 3, '12-20', 2, ['Elevacao Lateral halteres']),
+        ex('Crucifixo invertido (posterior de ombro)', 'Ombro', 3, '10-15', 1),
+        ex('Face pull', 'Ombro', 2, '12-15', 2.5, ['Face Pull']),
+      ],
+    },
+    {
+      rotulo: 'Bíceps e tríceps',
+      exercicios: [
+        ex('Rosca Scott', 'Bíceps', 3, '8-12', 5),
+        ex('Tríceps polia', 'Tríceps', 3, '10-15', 5, ['Triceps Polia', 'Triceps Pulley']),
+        ex('Rosca bayesian', 'Bíceps', 2, '8-12', 2.5),
+        ex('Tríceps francês', 'Tríceps', 3, '8-12', 5, ['Triceps francês']),
+        ex('Rosca martelo corda', 'Bíceps', 2, '10-15', 5, ['Rosca Marcelo Corda']),
+        ex('Tríceps cruzado', 'Tríceps', 2, '12-15', 2.5, ['Triceps Cruzado', 'Tricpes cruzado']),
+      ],
+    },
+    {
+      rotulo: 'Pernas B',
+      exercicios: [
+        ex('Leg press', 'Pernas', 2, '10-15', 10, ['Leg press H']),
+        ex('Flexora deitado', 'Pernas', 2, '10-15', 5, ['Flexora Deitado', 'Mesa flexora']),
+        ex('Cadeira abdutora', 'Pernas', 2, '12-15', 5),
+        ex('Cadeira adutora', 'Pernas', 2, '12-15', 5),
+      ],
+    },
+  ],
+}

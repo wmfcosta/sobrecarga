@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { sugerirProgressao } from '../lib/duplaProgressao'
 
 // Treino do dia gerado a partir de um dia do plano: cada exercício já vem com as
 // linhas de série prescritas. O aluno preenche carga e repetições e confirma cada linha.
@@ -26,8 +27,11 @@ function num(v) {
   return v === '' || v == null ? null : Number(String(v).replace(',', '.'))
 }
 
-function LinhaPlano({ avancado, rotulo, tipo, alvo, nota, anterior, salva, onTipo, onSalvar, onRemover }) {
-  const [carga, setCarga] = useState(salva?.carga_kg != null ? String(Number(salva.carga_kg)) : '')
+function LinhaPlano({ avancado, rotulo, tipo, alvo, nota, anterior, cargaSugerida, salva, onTipo, onSalvar, onRemover }) {
+  // Linha nova do plano de progressão já vem com a carga sugerida; o aluno só confirma as repetições
+  const [carga, setCarga] = useState(
+    salva?.carga_kg != null ? String(Number(salva.carga_kg)) : cargaSugerida != null ? String(cargaSugerida) : '',
+  )
   const [reps, setReps] = useState(salva?.repeticoes != null ? String(salva.repeticoes) : '')
   const [salvando, setSalvando] = useState(false)
 
@@ -106,7 +110,11 @@ function LinhaPlano({ avancado, rotulo, tipo, alvo, nota, anterior, salva, onTip
   )
 }
 
+const ROTULO_ACAO = { subir: '↑ Subir', manter: '= Manter', reduzir: '↓ Reduzir', novo: 'Primeira vez:' }
+
 function ExercicioDoPlano({ ex, avancado, series, tiposEditados, onTipo, onSalvar, onRemover, onGif }) {
+  // Dupla progressão (só nos planos com degrau de carga, como "Progressão por grupo")
+  const sugestao = sugerirProgressao(ex.series, ex.anterior)
   const tipos = ex.series.map((s, i) => tiposEditados[i] ?? series.find((x) => x.numero_serie === i + 1)?.tipo_serie ?? s.tipo ?? null)
   const feitas = ex.series.filter((_, i) => series.some((x) => x.numero_serie === i + 1)).length
   const extras = series.filter((x) => x.numero_serie > ex.series.length)
@@ -120,6 +128,11 @@ function ExercicioDoPlano({ ex, avancado, series, tiposEditados, onTipo, onSalva
           <p className="texto-secundario">{feitas}/{ex.series.length} séries</p>
         </div>
       </div>
+      {sugestao && (
+        <p className={`sugestao-progressao sugestao-${sugestao.acao}`}>
+          <strong>{ROTULO_ACAO[sugestao.acao]}</strong> {sugestao.texto}
+        </p>
+      )}
       {ex.observacoes && <p className="texto-secundario obs-plano">{ex.observacoes}</p>}
       <ul className="lista-plano">
         {ex.series.map((s, i) => {
@@ -133,6 +146,7 @@ function ExercicioDoPlano({ ex, avancado, series, tiposEditados, onTipo, onSalva
               alvo={s.reps}
               nota={s.nota}
               anterior={ex.anterior?.find((a) => a.numero_serie === i + 1)}
+              cargaSugerida={sugestao?.carga ?? null}
               salva={salva}
               onTipo={(t) => onTipo(i, t)}
               onSalvar={(valores) => onSalvar(ex, i, tipos, valores, salva)}

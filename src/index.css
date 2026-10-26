@@ -1443,3 +1443,12 @@ button, input, select {
   .abas-progressao { flex-direction: column; align-items: flex-start; gap: 6px; }
   .abas-progressao .filtros-chip { width: 100%; }
 }
+
+/* Sugestão da dupla progressão no treino do plano */
+.sugestao-progressao { margin: 0; padding: 8px 10px; border-radius: 8px; font-size: 13px; line-height: 1.4; border: 1px solid var(--borda); background: var(--superficie-alta); }
+.sugestao-progressao strong { margin-right: 4px; }
+.sugestao-subir { border-color: rgba(62, 207, 142, 0.5); }
+.sugestao-subir strong { color: #3ecf8e; }
+.sugestao-reduzir { border-color: rgba(232, 84, 46, 0.5); }
+.sugestao-reduzir strong { color: var(--ferrugem); }
+.sugestao-manter strong, .sugestao-novo strong { color: var(--aco); }
