@@ -270,9 +270,13 @@ export default function Progressao() {
                           <tr className={`linha-grade${aberto === e.exercicio ? ' linha-aberta' : ''}`}
                             onClick={() => setAberto(aberto === e.exercicio ? null : e.exercicio)}>
                             <td className="col-num">{i + 1}</td>
-                            <td className="col-fixa">
-                              <span className="seta-grade">{aberto === e.exercicio ? '▾' : '▸'}</span>
-                              {e.exercicio}{e.alertas > 0 && <span className="marca-alerta" title={`${e.alertas} série(s) para conferir`}> ⚠</span>}
+                            <td className="col-fixa" title={e.exercicio}>
+                              <div className="celula-exercicio">
+                                <span className="seta-grade" aria-hidden>{aberto === e.exercicio ? '▾' : '▸'}</span>
+                                <span>
+                                  {e.exercicio}{e.alertas > 0 && <span className="marca-alerta" title={`${e.alertas} série(s) para conferir`}> ⚠</span>}
+                                </span>
+                              </div>
                             </td>
                             <td>{e.treinos}</td>
                             <td>{e.series}</td>
