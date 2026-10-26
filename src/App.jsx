@@ -9,6 +9,7 @@ import Treino from './pages/Treino'
 import Exercicios from './pages/Exercicios'
 import Historico from './pages/Historico'
 import Progresso from './pages/Progresso'
+import Progressao from './pages/Progressao'
 import Perfil from './pages/Perfil'
 import Avaliacoes from './pages/Avaliacoes'
 import Plano from './pages/Plano'
@@ -64,6 +65,7 @@ function AreaLogada() {
           <Route path="/exercicios" element={<Exercicios />} />
           <Route path="/historico" element={<Historico />} />
           <Route path="/progresso" element={<Progresso />} />
+          <Route path="/progressao" element={<Progressao />} />
           <Route path="/perfil" element={<Perfil />} />
           <Route path="/avaliacoes" element={<Avaliacoes />} />
           <Route path="/plano" element={<Plano />} />

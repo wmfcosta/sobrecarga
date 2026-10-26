@@ -1389,3 +1389,55 @@ button, input, select {
 .botao-linha-plano.feito { background: transparent; color: #3ecf8e; border-color: #3ecf8e; opacity: 1; font-size: 18px; }
 .linha-plano-rodape { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .linha-plano-nota { color: var(--texto-secundario); font-size: 11px; line-height: 1.35; }
+
+/* ---------- Progressão (grade de exercícios e cargas) ---------- */
+.filtros-progressao { display: flex; flex-direction: column; gap: 12px; }
+.resumo-progressao { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.resumo-progressao > div { background: var(--superficie); border: 1px solid var(--borda); border-radius: 10px; padding: 10px 8px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.resumo-progressao strong { font-family: var(--fonte-dado); font-size: 20px; }
+.resumo-progressao span { font-size: 11px; color: var(--texto-secundario); text-align: center; }
+.resumo-progressao .resumo-alerta strong { color: #f5b83d; }
+.abas-progressao { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.abas-progressao .filtros-chip { min-width: 0; }
+.dica-grade { font-size: 12px; margin: -8px 0 0; }
+.grade-rolagem { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--borda); border-radius: 10px; background: var(--superficie); max-height: 70vh; overflow-y: auto; }
+.grade-progressao { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 13px; }
+.grade-progressao th, .grade-progressao td { padding: 8px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--borda); }
+.grade-progressao td { font-family: var(--fonte-dado); }
+.grade-progressao th { position: sticky; top: 0; z-index: 2; background: var(--superficie-alta); font-weight: 600; color: var(--texto-secundario); font-size: 12px; }
+.grade-progressao th button { background: none; border: 0; padding: 0; font: inherit; color: inherit; cursor: pointer; white-space: nowrap; }
+.grade-progressao th[aria-sort="ascending"], .grade-progressao th[aria-sort="descending"] { color: var(--texto); }
+.grade-progressao .col-fixa { position: sticky; left: 0; z-index: 1; background: var(--superficie); text-align: left; font-family: var(--fonte-titulo); max-width: 190px; overflow: hidden; text-overflow: ellipsis; box-shadow: 1px 0 0 var(--borda); }
+.grade-progressao th.col-fixa { z-index: 3; background: var(--superficie-alta); }
+.grade-progressao .col-num { color: var(--texto-secundario); text-align: center; padding-right: 4px; }
+.grade-progressao .col-texto { text-align: left; white-space: normal; min-width: 220px; font-size: 12px; }
+.grade-progressao tbody tr:hover td { background: var(--superficie-alta); }
+.linha-grade { cursor: pointer; }
+.linha-aberta td, .linha-aberta .col-fixa { background: var(--superficie-alta); }
+.seta-grade { display: inline-block; width: 14px; color: var(--texto-secundario); }
+.evolucao-sobe { color: #3ecf8e; font-weight: 700; }
+.evolucao-desce { color: var(--ferrugem); font-weight: 700; }
+.evolucao-igual { color: var(--texto-secundario); }
+.marca-alerta, .serie-alerta, .linha-alerta .col-fixa { color: #f5b83d; }
+.linha-detalhe td { background: var(--bg); padding: 0; white-space: normal; text-align: left; }
+.linha-detalhe:hover td { background: var(--bg) !important; }
+.detalhe-progressao { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; position: sticky; left: 0; max-width: min(100vw - 48px, 640px); font-family: var(--fonte-titulo); }
+.detalhe-progressao-topo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 8px; }
+.detalhe-progressao-topo p { margin: 0 0 4px; font-size: 12px; }
+.tendencia { width: 260px; max-width: 100%; height: 56px; color: var(--ferrugem); display: block; }
+.lista-dias-progressao { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.lista-dias-progressao li { display: grid; grid-template-columns: 72px 64px 1fr; gap: 8px; font-size: 12px; font-family: var(--fonte-dado); padding: 4px 0; border-bottom: 1px dashed var(--borda); }
+.lista-dias-progressao li:last-child { border-bottom: 0; }
+.dia-data { color: var(--texto-secundario); }
+.dia-max { font-weight: 700; }
+.linha-total td { font-weight: 700; }
+@media (max-width: 420px) {
+  .resumo-progressao strong { font-size: 17px; }
+  .grade-progressao th, .grade-progressao td { padding: 7px 8px; }
+  .grade-progressao .col-fixa { max-width: 140px; }
+}
+.conteudo-app:has(.pagina-larga) { max-width: 1100px; }
+@media (max-width: 560px) {
+  .abas-progressao { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .abas-progressao .filtros-chip { width: 100%; }
+}
