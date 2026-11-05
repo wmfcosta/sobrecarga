@@ -7,7 +7,7 @@ import { DicaDescanso } from '../components/BarraDescanso'
 import SugestaoFullBody from '../components/SugestaoFullBody'
 import SessaoTreino from '../components/SessaoTreino'
 import TreinoDoPlano from '../components/TreinoDoPlano'
-import UltimaVez, { ultimaSessao } from '../components/UltimaVez'
+import UltimaVez from '../components/UltimaVez'
 import { useAuth } from '../lib/AuthContext'
 import { useDescanso } from '../lib/DescansoContext'
 
@@ -96,12 +96,23 @@ export default function Treino() {
     salvarRascunho({ exercicioId, carga, repeticoes, tempoMin, calorias })
   }, [exercicioId, carga, repeticoes, tempoMin, calorias, editandoId])
 
-  // Histórico: alimenta a sugestão full body e o quadro "Última vez" do exercício escolhido
   useEffect(() => {
+    if (!fullbodyAtivo) return
     api.getHistory().then((h) => setHistorico(h ?? [])).catch(() => {})
-  }, [])
+  }, [fullbodyAtivo])
 
-  const sessaoAnterior = ultimaSessao(historico, exercicioId, data)
+  // Quadro "Última vez": busca no servidor só a última sessão do exercício escolhido
+  // ({ exercicioId, data, sessao }; sessao null = nunca feito; estado ausente = carregando)
+  const [ultimaVez, setUltimaVez] = useState(null)
+  useEffect(() => {
+    if (!exercicioId) return
+    let cancelado = false
+    api.getUltimaSessao(exercicioId, data)
+      .then((sessao) => { if (!cancelado) setUltimaVez({ exercicioId, data, sessao }) })
+      .catch(() => {})
+    return () => { cancelado = true }
+  }, [exercicioId, data])
+  const ultimaVezPronta = ultimaVez?.exercicioId === exercicioId && ultimaVez?.data === data
 
   function escolherDaUltimaVez(valores) {
     if (valores.carga != null) setCarga(String(valores.carga))
@@ -341,8 +352,8 @@ export default function Treino() {
             <p className="texto-secundario">Demonstração de {exercicioSelecionado.nome}</p>
           </div>
         )}
-        {exercicioSelecionado && exercicioSelecionado.nome === buscaExercicio && !editandoId && (
-          <UltimaVez sessao={sessaoAnterior} serieNumero={serieNumero} onEscolher={escolherDaUltimaVez} />
+        {exercicioSelecionado && exercicioSelecionado.nome === buscaExercicio && !editandoId && ultimaVezPronta && (
+          <UltimaVez sessao={ultimaVez.sessao} serieNumero={serieNumero} onEscolher={escolherDaUltimaVez} />
         )}
         <div className="linha-tres-campos">
           <label className="campo">

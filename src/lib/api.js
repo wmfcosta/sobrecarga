@@ -48,6 +48,8 @@ export const api = {
   updateSet: (payload) => request('/workout-sets', { method: 'PUT', body: payload, auth: true }),
   deleteSet: (id) => request(`/workout-sets?id=${encodeURIComponent(id)}`, { method: 'DELETE', auth: true }),
   getHistory: () => request('/history', { auth: true }),
+  getUltimaSessao: (exercicioId, antes) =>
+    request(`/history?exercicio=${encodeURIComponent(exercicioId)}&antes=${encodeURIComponent(antes)}`, { auth: true }),
   getProfile: () => request('/profile', { auth: true }),
   updateProfile: (payload) => request('/profile', { method: 'PUT', body: payload, auth: true }),
   listAssessments: () => request('/assessments', { auth: true }),

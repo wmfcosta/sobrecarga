@@ -14,21 +14,6 @@ function degrauDe(carga) {
   return carga < 10 ? 1 : 2.5
 }
 
-// Última sessão do exercício anterior à data informada
-export function ultimaSessao(historico, exercicioId, antesDe) {
-  if (!exercicioId) return null
-  const treinos = (historico || [])
-    .filter((t) => t.data < antesDe)
-    .sort((a, b) => (a.data < b.data ? 1 : -1))
-  for (const t of treinos) {
-    const series = t.series
-      .filter((s) => s.exercise_id === exercicioId)
-      .sort((a, b) => a.numero_serie - b.numero_serie)
-    if (series.length) return { data: t.data, series }
-  }
-  return null
-}
-
 export default function UltimaVez({ sessao, serieNumero, onEscolher }) {
   if (!sessao) {
     return <p className="ultima-vez ultima-vez-vazia">Primeira vez neste exercício: escolha uma carga confortável.</p>
