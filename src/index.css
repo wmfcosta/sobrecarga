@@ -1452,3 +1452,19 @@ button, input, select {
 .sugestao-reduzir { border-color: rgba(232, 84, 46, 0.5); }
 .sugestao-reduzir strong { color: var(--ferrugem); }
 .sugestao-manter strong, .sugestao-novo strong { color: var(--aco); }
+
+/* Quadro "Última vez" no formulário de série */
+.ultima-vez { margin: 4px 0 12px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--borda); background: var(--superficie-alta); }
+.ultima-vez-vazia { font-size: 13px; color: var(--texto-secundario); }
+.ultima-vez-titulo { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--texto-secundario); }
+.ultima-vez-series { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; font-family: var(--fonte-dado); font-size: 14px; }
+.ultima-vez-series li { padding: 3px 8px; border-radius: 6px; border: 1px solid var(--borda); background: var(--superficie); }
+.ultima-vez-series li small { color: var(--texto-secundario); font-size: 11px; }
+.ultima-vez-series li.ultima-vez-ref { border-color: var(--aco); }
+.ultima-vez-dica { margin: 10px 0 6px; font-size: 12px; color: var(--texto-secundario); }
+.ultima-vez-acoes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.ultima-vez-acoes button { padding: 8px 4px; border-radius: 8px; border: 1px solid var(--borda); background: var(--superficie); color: var(--texto-secundario); font-size: 12px; line-height: 1.3; cursor: pointer; }
+.ultima-vez-acoes button strong { color: var(--texto); font-family: var(--fonte-dado); font-size: 14px; }
+.ultima-vez-acoes button.ultima-vez-subir { border-color: rgba(62, 207, 142, 0.5); }
+.ultima-vez-acoes button.ultima-vez-subir strong { color: #3ecf8e; }
+.ultima-vez-acoes button:active { transform: scale(0.97); }

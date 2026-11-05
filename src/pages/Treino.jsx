@@ -7,6 +7,7 @@ import { DicaDescanso } from '../components/BarraDescanso'
 import SugestaoFullBody from '../components/SugestaoFullBody'
 import SessaoTreino from '../components/SessaoTreino'
 import TreinoDoPlano from '../components/TreinoDoPlano'
+import UltimaVez, { ultimaSessao } from '../components/UltimaVez'
 import { useAuth } from '../lib/AuthContext'
 import { useDescanso } from '../lib/DescansoContext'
 
@@ -95,10 +96,19 @@ export default function Treino() {
     salvarRascunho({ exercicioId, carga, repeticoes, tempoMin, calorias })
   }, [exercicioId, carga, repeticoes, tempoMin, calorias, editandoId])
 
+  // Histórico: alimenta a sugestão full body e o quadro "Última vez" do exercício escolhido
   useEffect(() => {
-    if (!fullbodyAtivo) return
     api.getHistory().then((h) => setHistorico(h ?? [])).catch(() => {})
-  }, [fullbodyAtivo])
+  }, [])
+
+  const sessaoAnterior = ultimaSessao(historico, exercicioId, data)
+
+  function escolherDaUltimaVez(valores) {
+    if (valores.carga != null) setCarga(String(valores.carga))
+    if (valores.reps != null) setRepeticoes(String(valores.reps))
+    if (valores.tempoMin != null) setTempoMin(String(valores.tempoMin))
+    if (valores.calorias != null) setCalorias(String(valores.calorias))
+  }
 
   function usarSugestao(item) {
     limparFormulario()
@@ -330,6 +340,9 @@ export default function Treino() {
             />
             <p className="texto-secundario">Demonstração de {exercicioSelecionado.nome}</p>
           </div>
+        )}
+        {exercicioSelecionado && exercicioSelecionado.nome === buscaExercicio && !editandoId && (
+          <UltimaVez sessao={sessaoAnterior} serieNumero={serieNumero} onEscolher={escolherDaUltimaVez} />
         )}
         <div className="linha-tres-campos">
           <label className="campo">
